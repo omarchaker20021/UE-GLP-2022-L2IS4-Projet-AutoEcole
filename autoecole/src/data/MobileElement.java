@@ -1,0 +1,19 @@
+package data;
+
+public abstract class MobileElement {
+	
+	private Position position;
+	
+	public MobileElement(Position position) {
+		this.position = position;
+	}
+
+	public Position getPosition() {
+		return position;
+	}
+
+	public void setPosition(Position position) {
+		this.position = position;
+	}
+
+}
