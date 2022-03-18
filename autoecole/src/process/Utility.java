@@ -41,5 +41,29 @@ public class Utility {
 		
 		return pointPosition; 
 	}
+	
+	/**
+	 * This method returns the center of an object from its position and its width and height
+	 * @param Position of the object and its width and height
+	 * @return Position of the center of the object
+	 * */
 
+	public static Position getObjectCenter(Position objectPosition, int objectWidth, int objectHeight) {
+		double x = objectPosition.getX();
+		double y = objectPosition.getY();
+		
+		x += objectWidth/2;
+		y += objectHeight/2;
+		
+		return new Position(x, y);
+	}
+	
+	public static double getVectorRadianWithCosinus(double ab, double bc) {
+		//On considere deux vecteurs ab horizontal et ac vertical
+		//et bc est la somme de ab et ac
+		// on trouve le cos(b) avec l'operation ab/ac
+		double cosb = ab/bc;
+		return Math.acos(cosb);
+	}
+	
 }

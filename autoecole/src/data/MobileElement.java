@@ -1,19 +1,25 @@
 package data;
 
-public abstract class MobileElement {
+	/**
+	 * Classe abstraite qui représente un element mobile
+	 * @author Omar CHAKER
+	 * */
+
+public abstract class MobileElement extends MapElement {
 	
-	private Position position;
+	private double vitesse;
 	
 	public MobileElement(Position position) {
-		this.position = position;
+		super(position);
+		this.vitesse = 0;
 	}
 
-	public Position getPosition() {
-		return position;
+	public double getVitesse() {
+		return vitesse;
 	}
 
-	public void setPosition(Position position) {
-		this.position = position;
+	public void setVitesse(double vitesse) {
+		this.vitesse = vitesse;
 	}
-
+	
 }

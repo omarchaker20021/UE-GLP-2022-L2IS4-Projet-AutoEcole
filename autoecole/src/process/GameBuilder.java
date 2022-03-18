@@ -24,9 +24,9 @@ public class GameBuilder {
 		int y0 = GameConfig.VERTICAL_ROAD_POSITION_Y;
 		
 		Position positionRoad1 = new Position(x0, y0);
-		Position positionRoad2 = new Position(x0 - GameConfig.ROAD_HEIGHT + 200, y0);
-		Position positionRoad3 = new Position(x0 - GameConfig.ROAD_HEIGHT + 200, y0);
-		Position positionRoad4 = new Position(x0 - GameConfig.ROAD_HEIGHT + 200, y0 + GameConfig.ROAD_HEIGHT - 200);
+		Position positionRoad2 = new Position(x0 + GameConfig.ROAD_WIDTH - GameConfig.ROAD_HEIGHT, y0 - GameConfig.ROAD_WIDTH);
+		Position positionRoad3 = new Position(x0 + GameConfig.ROAD_WIDTH - GameConfig.ROAD_HEIGHT, y0);
+		Position positionRoad4 = new Position(x0 + GameConfig.ROAD_WIDTH - GameConfig.ROAD_HEIGHT, y0 + GameConfig.ROAD_HEIGHT);
 		//On affiche un panneau stop
 		int xStop = GameConfig.STOP_POSITION_X;
 		int yStop = GameConfig.STOP_POSITION_Y;

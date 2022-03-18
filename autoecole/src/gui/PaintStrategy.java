@@ -54,9 +54,10 @@ public class PaintStrategy {
 	public void paint(Car car, Graphics g) {
 		Position position = car.getPosition();
 		
-		int x = position.getX();
-		int y = position.getY();
+		int x = (int)position.getX();
+		int y = (int)position.getY();
 		
+
 		g.drawImage(Utility.readImage("src/images/mercedes.png"), x, y, GameConfig.CAR_WIDTH, GameConfig.CAR_HEIGHT, null);
 		
 	}
@@ -69,8 +70,8 @@ public class PaintStrategy {
 	private void paintVerticalLine(Line line, Graphics g) {
 		Position position = line.getPosition();
 		
-		int x = position.getX();
-		int y = position.getY();
+		int x = (int)position.getX();
+		int y = (int)position.getY();
 		
 		Graphics2D g2D = (Graphics2D)g;
 		
@@ -92,8 +93,8 @@ public class PaintStrategy {
 	private void paintHorizontalLine(Line line, Graphics g) {
 		Position position = line.getPosition();
 		
-		int x = position.getX();
-		int y = position.getY();
+		int x = (int)position.getX();
+		int y = (int)position.getY();
 		
 		Graphics2D g2D = (Graphics2D)g;
 		
@@ -118,8 +119,8 @@ public class PaintStrategy {
 	private void paintVerticalRoad(Road verticalRoad, Graphics g) {
 		Position position = verticalRoad.getPosition();
 		
-		int x = position.getX();
-		int y = position.getY();
+		int x = (int)position.getX();
+		int y = (int)position.getY();
 		
 		g.setColor(Color.GRAY);
 		
@@ -137,8 +138,8 @@ public class PaintStrategy {
 		Position position = horizontalRoad.getPosition();
 		Line line = horizontalRoad.getLine();
 		
-		int x = position.getX();
-		int y = position.getY();
+		int x = (int)position.getX();
+		int y = (int)position.getY();
 		
 		g.setColor(Color.GRAY);
 		
@@ -154,8 +155,8 @@ public class PaintStrategy {
 	private void paintPanel(Panel stop, Graphics g) {
 		Position position = stop.getPosition();
 		
-		int x = position.getX();
-		int y = position.getY();
+		int x = (int)position.getX();
+		int y = (int)position.getY();
 		
 		g.drawImage(Utility.readImage("src/images/stop.png"), x, y, GameConfig.STOP_WIDTH, GameConfig.STOP_HEIGHT, null);
 	}

@@ -34,27 +34,27 @@ public class Map {
 		this.panels = panels;
 	}
 
-	public boolean isOnLeftBorder(Position position) {
-		int x = position.getX();
+	public boolean isCarOnLeftBorder(Position position) {
+		double x = position.getX();
 		
 		return x == 0;
 	}
 	
-	public boolean isOnRightBorder(Position position) {
-		int x = position.getX();
+	public boolean isCarOnRightBorder(Position position) {
+		double x = position.getX();
 		
-		return x == GameConfig.MAP_WIDTH;
+		return x >= GameConfig.MAP_WIDTH - GameConfig.CAR_WIDTH;
 	}
-	public boolean isOnTopBorder(Position position) {
-		int y = position.getY();
+	public boolean isCarOnTopBorder(Position position) {
+		double y = position.getY();
 		
 		return y == 0;
 	}
 	
-	public boolean isOnBottomBorder(Position position) {
-		int y = position.getY();
+	public boolean isCarOnBottomBorder(Position position) {
+		double y = position.getY();
 		
-		return y == GameConfig.MAP_HEIGHT;
+		return y == GameConfig.MAP_HEIGHT - GameConfig.CAR_HEIGHT;
 		
 	}
 	

@@ -22,7 +22,7 @@ public class GameConfig {
 	/** Largeur de la route **/
 	public static final int ROAD_WIDTH = 400;
 	/** Hauteur de la route **/
-	public static final int ROAD_HEIGHT = 600;
+	public static final int ROAD_HEIGHT = 1200;
 
 	/** Position x de la route **/
 	public static final int VERTICAL_ROAD_POSITION_X = (MAP_WIDTH / 2) - (ROAD_WIDTH / 2);
@@ -37,7 +37,7 @@ public class GameConfig {
 	/** Position x de la voiture **/
 	public static final int CAR_POSITION_X = VERTICAL_ROAD_POSITION_X + (ROAD_WIDTH / 2) + (ROAD_WIDTH / 4) - (CAR_WIDTH / 2);
 	/** Position y de la voiture **/
-	public static final int CAR_POSITION_Y = ROAD_HEIGHT - CAR_HEIGHT; 
+	public static final int CAR_POSITION_Y = MAP_HEIGHT - CAR_HEIGHT; 
 	
 	
 	/** Largeur de la ligne **/
@@ -61,10 +61,13 @@ public class GameConfig {
 	public static final int STOP_POSITION_Y = 40;
 	
 	/** Rapidité du jeu **/
-	public static final int GAME_SPEED = 1000;
+	public static final int GAME_SPEED = 100;
 	
-	/** Différentiel du mouvement en avant **/
-	public static final int MOVE_INTERVAL = 5;
+	/** Differentiel du mouvement en avant **/
+	public static final int MOVE_INTERVAL = 1;
+	
+	/** Le radian de la rotation effectuée sur les objets **/
+	public static final int TURN_RADIAN = 5;
 	
 	
 	

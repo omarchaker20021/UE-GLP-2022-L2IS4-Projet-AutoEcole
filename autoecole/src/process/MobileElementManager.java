@@ -10,10 +10,13 @@ public class MobileElementManager {
 	
 	private Car car;
 	
+	private Vector rotationVector = new Vector();
+		
 	private Map map;
 
 	public MobileElementManager(Map map) {
 		this.map = map;
+		this.rotationVector = new Vector(GameConfig.MOVE_INTERVAL, 0);
 	}
 	
 	public void set(List<Panel> panels, List<Road> roads) {
@@ -25,92 +28,76 @@ public class MobileElementManager {
 		this.car = car;
 	}
 	
-	public void moveStraight() {
+	public void accelerate() {
+		
+		double length = rotationVector.getLength();
+		
+		double pace = car.getPace();
+		pace += length;
+		car.setPace(pace);
+	}
+	
+	public void decelerate() {
+		
+		double length = rotationVector.getLength();
+		
+		double pace = car.getPace();
+		pace -= length;
+		car.setPace(pace);
+		
+	}
+	
+	public void turnLeft() {
+		moveMap(GameConfig.MOVE_INTERVAL, 0);
+	}
+	
+	public void turnRight() {
+		moveMap(GameConfig.MOVE_INTERVAL ,0);
+	}
+	
+	public void moveCar() {
+		
+		double theta = rotationVector.getTheta();
+		double pace = car.getPace();
+		
+		double x = pace * Math.cos(Math.toRadians(-theta + 90));
+		double y = pace * Math.sin(Math.toRadians(-theta + 90));
+		
+		moveMap(x, y);
+	}
+	
+	
+	private void moveMap(double x, double y) {
 		
 		ArrayList<Road> roads = this.map.getRoads();
 		ArrayList<Panel> panels = this.map.getPanels();
 
 		
-		Position carPosition = car.getPosition();
-		
-		int yCar = carPosition.getY(); 
-		
 		for (Road road : roads) {
 			Position position = road.getPosition();
 			
-			int yRoad = position.getY();
+			double xRoad = position.getX();
+			double yRoad = position.getY();
 			
-			if (yCar <= GameConfig.CITY_HEIGHT){
-				position.setY(yRoad + GameConfig.MOVE_INTERVAL);
-				road.setPosition(position);
-			}
+			position.setX(xRoad + x);
+			position.setY(yRoad + y);
+			
+			road.setPosition(position);
 		}
 		
 		for(Panel panel : panels) {
 			Position position = panel.getPosition();
 			
-			int yPanel = position.getY();
+			double xPanel = position.getX();
+			double yPanel = position.getY();
 			
-			if (yCar <= GameConfig.CITY_HEIGHT){
-				position.setY(yPanel + GameConfig.MOVE_INTERVAL);
-				panel.setPosition(position);
-			}
+			position.setX(xPanel + x);
+			position.setY(yPanel + y);
+			
+			panel.setPosition(position);
 		}
 		set(panels, roads);
 		
-	}
-	
-	public void turnLeft() {
-		Position position = car.getPosition();
-		
-		int x = position.getX();
-		
-		if(x >= GameConfig.VERTICAL_ROAD_POSITION_X + GameConfig.MOVE_INTERVAL) {
-			position.setX(x - GameConfig.MOVE_INTERVAL);
-			car.setPosition(position);
-		}
-		
-	}
-	
-	public void turnRight() {
-		Position position = car.getPosition();
-		
-		int x = position.getX();
-		
-		if(x <= GameConfig.VERTICAL_ROAD_POSITION_X + GameConfig.ROAD_WIDTH - GameConfig.MOVE_INTERVAL) {
-			position.setX(x + GameConfig.MOVE_INTERVAL);
-			car.setPosition(position);
-		}
-		
-	}
-	
-	public void backReverse() {
-		List<Panel> panels = this.map.getPanels();
-		List<Road> roads = this.map.getRoads();
-		
-		Position carPosition = car.getPosition();
-		
-		int yCar = carPosition.getY(); 
-		
-		if(yCar < GameConfig.ROAD_HEIGHT) {
-			for (Road road : roads) {
-				
-				Position position = road.getPosition();
-				int yRoad = position.getY();
-				position.setY(yRoad + GameConfig.MOVE_INTERVAL);
-				road.setPosition(position);
-			
-			}
-			
-			for(Panel panel : panels) {
-				
-				Position position = panel.getPosition();
-				int yPanel = position.getY();
-				position.setY(yPanel + GameConfig.MOVE_INTERVAL);
-				panel.setPosition(position);
-				
-			}	
-		}
 	}
 	
 	public Car getCar() {
@@ -118,6 +105,21 @@ public class MobileElementManager {
 	}
 	public Map getMap() {
 		return this.map;
+	}
+	
+	public void setRotationVector(Vector rotationVector) {
+		this.rotationVector = rotationVector;
+	}
+	
+	public Vector getRotationVector(){
+		return this.rotationVector;
+	}
+	
+	public void setRotationDegrees(double rotationDegrees) {
+		rotationVector.setTheta(rotationDegrees);
+	}
+	public double getRotationDegrees() {
+		return rotationVector.getTheta();
 	}
 
 }

@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -36,7 +38,10 @@ public class MainGUI extends JFrame implements Runnable {
 	
 	private GameDisplay dashboard;
 	
-
+	private boolean stop = true;
+	
+	private MainGUI instance = this;
+	
 	public MainGUI(String title) {
 		super(title);
 		init();
@@ -60,7 +65,8 @@ public class MainGUI extends JFrame implements Runnable {
 		panel1.setBorder(lineBorder);
 		
 		JPanel panel2 = new JPanel();
-		JButton button2 = new JButton(" Button ");
+		JButton button2 = new JButton(" Start ");
+		button2.addActionListener(new ActionStart());
 		JTextField textField = new JTextField();
 		textField.setColumns(10);
 		panel2.setPreferredSize(new Dimension(100, 100));
@@ -93,15 +99,33 @@ public class MainGUI extends JFrame implements Runnable {
 
 	@Override
 	public void run() {
-		while (true) {
+		while (!stop) {
 			try {
 				Thread.sleep(GameConfig.GAME_SPEED);
 			} catch (InterruptedException e) {
 				System.out.println(e.getMessage());
 			}
+			manager.moveCar();
 			dashboard.repaint();
 		}
 	}
+	
+	private class ActionStart implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if(stop) {
+				stop = false;
+				Thread chronoThread = new Thread(instance);
+				chronoThread.start();
+			}
+			else{
+				stop = true;
+			}
+		}
+		
+	}
+	
 	
 	private class KeyControls implements KeyListener{
 
@@ -115,18 +139,24 @@ public class MainGUI extends JFrame implements Runnable {
 			char typeChar = e.getKeyChar();
 			switch(typeChar) {
 			case 'z':
-				manager.moveStraight();
+				manager.accelerate();
 				dashboard.repaint();
 				break;
 			case 'q':
 				manager.turnLeft();
+				manager.setRotationDegrees(manager.getRotationDegrees() + GameConfig.TURN_RADIAN);
 				dashboard.repaint();
 				break;
 			case 'd':
 				manager.turnRight();
+				manager.setRotationDegrees(manager.getRotationDegrees() - GameConfig.TURN_RADIAN);
 				dashboard.repaint();
 				break;
-			default : 
+			case 's':
+				manager.decelerate();
+				dashboard.repaint();
+				break;
+			default :
 				break;
 			}
 		}

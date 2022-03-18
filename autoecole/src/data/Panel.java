@@ -2,7 +2,7 @@ package data;
 
 import exceptions.PanelNameException;
 
-public class Panel extends MobileElement {
+public class Panel extends MapElement {
 	
 	private String name;
 

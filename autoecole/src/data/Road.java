@@ -8,7 +8,7 @@ import exceptions.AxisException;
  * @author Rayane KHAMAILY
  * */
 
-public class Road extends MobileElement {
+public class Road extends MapElement {
 	
 	
 	/** This constant defines the axis of the road which is vertical **/
@@ -45,18 +45,20 @@ public class Road extends MobileElement {
 	private void setLine(){
 		Position linePosition = this.line.getPosition();
 		
-		int x = this.getPosition().getX();
-		int y = this.getPosition().getY();
+		double x = this.getPosition().getX();
+		double y = this.getPosition().getY();
 		
 		if(this.roadAxis == VERTICAL_AXIS) {
-			linePosition.setX(x + GameConfig.VERTICAL_ROAD_POSITION_X + (GameConfig.ROAD_WIDTH/2) - (GameConfig.LINE_WIDTH/2));
+			linePosition.setX(x + (GameConfig.ROAD_WIDTH/2) - (GameConfig.LINE_WIDTH/2));
 			linePosition.setY(y);
 		}
 		
 		if(this.roadAxis == HORIZONTAL_AXIS) {
 			linePosition.setX(x);
-			linePosition.setY(y+ GameConfig.VERTICAL_ROAD_POSITION_X + (GameConfig.ROAD_WIDTH/2) - (GameConfig.LINE_WIDTH/2));
+			linePosition.setY(y + (GameConfig.ROAD_WIDTH/2) - (GameConfig.LINE_WIDTH/2));
 		}
+		
+		this.line.setPosition(linePosition);
 		
 	}
 	

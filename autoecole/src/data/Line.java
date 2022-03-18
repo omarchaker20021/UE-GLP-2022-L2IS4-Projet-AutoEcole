@@ -5,7 +5,7 @@ package data;
  * @author Rayane KHAMAILY
  * */
 
-public class Line extends MobileElement {
+public class Line extends MapElement {
 
 	public Line(Position position) {
 		super(position);
