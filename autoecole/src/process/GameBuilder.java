@@ -1,14 +1,12 @@
 package process;
 
 import config.GameConfig;
-import data.Car;
-import data.Line;
-import data.Map;
-import data.Panel;
-import data.Position;
-import data.Road;
+import data.geometry.Position;
+import data.map.Line;
+import data.map.Map;
+import data.map.Road;
+import data.mobile.Car;
 import exceptions.AxisException;
-import exceptions.PanelNameException;
 
 import java.util.ArrayList;
 
@@ -16,54 +14,22 @@ public class GameBuilder {
 	
 	public static Map buildMap() {
 		ArrayList<Road> roads = new ArrayList<Road>();
-		ArrayList<Panel> panels = new ArrayList<Panel>();
 		
+		double x0 = GameConfig.VERTICAL_ROAD_POSITION_X;
+		double y0 = GameConfig.MAP_HEIGHT - GameConfig.ROAD_WIDTH;
 		
-		// On va initialiser un parcours composé de 4 routes (2 verticales et 2 horizontales)
-		int x0 = GameConfig.VERTICAL_ROAD_POSITION_X;
-		int y0 = GameConfig.VERTICAL_ROAD_POSITION_Y;
+		Position position = new Position(x0, y0);
+		Position position2 = new Position(x0, y0 - GameConfig.ROAD_HEIGHT);
 		
-		Position positionRoad1 = new Position(x0, y0);
-		Position positionRoad2 = new Position(x0 + GameConfig.ROAD_WIDTH - GameConfig.ROAD_HEIGHT, y0 - GameConfig.ROAD_WIDTH);
-		Position positionRoad3 = new Position(x0 + GameConfig.ROAD_WIDTH - GameConfig.ROAD_HEIGHT, y0);
-		Position positionRoad4 = new Position(x0 + GameConfig.ROAD_WIDTH - GameConfig.ROAD_HEIGHT, y0 + GameConfig.ROAD_HEIGHT);
-		//On affiche un panneau stop
-		int xStop = GameConfig.STOP_POSITION_X;
-		int yStop = GameConfig.STOP_POSITION_Y;
-		Position stopPosition = new Position(xStop, yStop);
+		//Utilisation de la méthode generateRoads()
 		
-		Road road1;
-		Line line1 = new Line();
-		Road road2;
-		Line line2 = new Line();
-		Road road3;
-		Line line3 = new Line();
-		Road road4;
-		Line line4 = new Line();
+		int nbVerticalRoads = 1;
+		int nbHorizontalRoads = 1;
 		
-		Panel stop;
+		roads = generateRoads(nbVerticalRoads, nbHorizontalRoads, position);
+		roads.addAll(generateRoads(nbVerticalRoads, nbHorizontalRoads, position2));
 		
-		try {
-			road1 = new Road(positionRoad1, Road.VERTICAL_AXIS, line1);
-			road2 = new Road(positionRoad2, Road.HORIZONTAL_AXIS, line2);
-			road3 = new Road(positionRoad3, Road.VERTICAL_AXIS, line3);
-			road4 = new Road(positionRoad4, Road.HORIZONTAL_AXIS, line4);
-			
-			roads.add(road1);
-			roads.add(road2);
-			roads.add(road3);
-			roads.add(road4);
-			
-			stop = new Panel("stop", stopPosition);
-			
-			panels.add(stop);
-		
-		}
-		catch (AxisException | PanelNameException e) {
-			e.printStackTrace();
-		}
-		
-		return new Map(roads, panels);
+		return new Map(roads);
 	}
 
 	public static MobileElementManager buildInitMobile(Map map) {
@@ -82,5 +48,86 @@ public class GameBuilder {
 		manager.set(car);
 		
 	}
+	
+	/**
+	 * This static method generates horizontal and vertical roads
+	 * from an initial position
+	 * @param nbVerticalRoads
+	 * 							number of vertical roads
+	 * @param nbHorizontalRoads
+	 *							number of horizontal roads
+	 * @param roadsPosition
+	 * 						initial position of the generated roads
+	 * @exception AxisException
+	 * 							this exception concerns the axis when constructing roads
+	 * @return roads
+	 * 				an ArrayList which contains all roads generated
+	 * */
+	
+	
+	private static ArrayList<Road> generateRoads(int nbVerticalRoads, int nbHorizontalRoads, Position roadsPosition){
+		
+		ArrayList<Road> roads = new ArrayList<Road>();
+		
+		Position roadPosition = new Position(roadsPosition.getX(), roadsPosition.getY());
+		
+		
+		for(int iteration = 0; iteration < nbVerticalRoads; iteration++) {
 
+			double y = roadPosition.getY();
+			
+			y -= (GameConfig.ROAD_HEIGHT + GameConfig.ROAD_WIDTH);
+			
+			roadPosition.setY(y);
+			
+			Line line = new Line();
+			try {
+				roads.add(new Road(new Position(roadPosition.getX(), roadPosition.getY()), Road.VERTICAL_AXIS, line));
+			} catch (AxisException e) {
+				e.printStackTrace();
+			}
+			
+		}
+		
+		roadPosition.setX(roadsPosition.getX());
+		roadPosition.setY(roadsPosition.getY());
+		
+		double y = roadPosition.getY();
+		
+		y -= GameConfig.ROAD_WIDTH;
+		
+		
+		for(int iteration = 0; iteration < nbHorizontalRoads; iteration++) {
+			
+			double x = roadPosition.getX();
+			
+			x -= GameConfig.ROAD_HEIGHT;
+			
+			roadPosition.setX(x);
+			roadPosition.setY(y);
+			
+			Line line = new Line();
+	
+			try {
+				roads.add(new Road(new Position(roadPosition.getX(), roadPosition.getY()), Road.HORIZONTAL_AXIS, line));
+			} catch (AxisException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return roads;
+	}
+	
+	/**
+	 * This static method generates a roundabout from an initial position.
+	 * 
+	 * @param roundaboutPosition
+	 * 						initial position of the roundabout.
+	 * @return roundabout
+	 * 				an ArrayList which contains all roads generated
+	 * */
+	/*
+	private static void generateRoundabout() {
+		
+	}*/
 }

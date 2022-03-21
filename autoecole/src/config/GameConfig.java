@@ -20,9 +20,9 @@ public class GameConfig {
 	public static final int MAP_HEIGHT = 600;
 	
 	/** Largeur de la route **/
-	public static final int ROAD_WIDTH = 400;
+	public static final int ROAD_WIDTH = 40;
 	/** Hauteur de la route **/
-	public static final int ROAD_HEIGHT = 1200;
+	public static final int ROAD_HEIGHT = 240;
 
 	/** Position x de la route **/
 	public static final int VERTICAL_ROAD_POSITION_X = (MAP_WIDTH / 2) - (ROAD_WIDTH / 2);
@@ -37,8 +37,7 @@ public class GameConfig {
 	/** Position x de la voiture **/
 	public static final int CAR_POSITION_X = VERTICAL_ROAD_POSITION_X + (ROAD_WIDTH / 2) + (ROAD_WIDTH / 4) - (CAR_WIDTH / 2);
 	/** Position y de la voiture **/
-	public static final int CAR_POSITION_Y = MAP_HEIGHT - CAR_HEIGHT; 
-	
+	public static final int CAR_POSITION_Y = MAP_HEIGHT - CAR_HEIGHT;
 	
 	/** Largeur de la ligne **/
 	public static final int LINE_WIDTH = 8;
@@ -51,17 +50,17 @@ public class GameConfig {
 	public static final int LINE_POSITION_Y = 0;
 	
 	/** Largeur du stop **/
-	public static final int STOP_WIDTH = 50;
+	public static final int PANEL_WIDTH = 50;
 	/** Hauteur du stop **/
-	public static final int STOP_HEIGHT = 100;
+	public static final int PANEL_HEIGHT = 100;
 	
 	/** Position x du stop **/
-	public static final int STOP_POSITION_X = VERTICAL_ROAD_POSITION_X + ROAD_WIDTH + (VERTICAL_ROAD_POSITION_X/2) - (STOP_WIDTH/2); 
+	public static final int STOP_POSITION_X = VERTICAL_ROAD_POSITION_X + ROAD_WIDTH + (VERTICAL_ROAD_POSITION_X/2) - (PANEL_WIDTH/2); 
 	/** Position y du stop **/
 	public static final int STOP_POSITION_Y = 40;
 	
 	/** Rapidité du jeu **/
-	public static final int GAME_SPEED = 100;
+	public static final int GAME_SPEED = 50;
 	
 	/** Differentiel du mouvement en avant **/
 	public static final int MOVE_INTERVAL = 1;

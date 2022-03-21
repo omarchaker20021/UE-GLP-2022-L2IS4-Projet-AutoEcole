@@ -1,27 +1,32 @@
 package process;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import config.GameConfig;
-import data.*;
+import data.geometry.Position;
+import data.geometry.Vector;
+import data.map.Map;
+import data.map.Road;
+import data.mobile.Car;
 
 public class MobileElementManager {
 	
 	private Car car;
 	
 	private Vector rotationVector = new Vector();
+	
+	private int distance;
 		
 	private Map map;
 
 	public MobileElementManager(Map map) {
 		this.map = map;
 		this.rotationVector = new Vector(GameConfig.MOVE_INTERVAL, 0);
+		this.distance = 0;
 	}
 	
-	public void set(List<Panel> panels, List<Road> roads) {
-		this.map.setPanels((ArrayList<Panel>) panels);
-		this.map.setRoads((ArrayList<Road>) roads);
+	public void set(ArrayList<Road> roads) {
+		this.map.setRoads(roads);
 	}
 	
 	public void set(Car car) {
@@ -48,29 +53,38 @@ public class MobileElementManager {
 	}
 	
 	public void turnLeft() {
-		moveMap(GameConfig.MOVE_INTERVAL, 0);
+		
+		double carPace = car.getPace();
+		if(carPace < 1) {
+			moveMap(GameConfig.MOVE_INTERVAL, 0);
+		}
 	}
 	
 	public void turnRight() {
-		moveMap(GameConfig.MOVE_INTERVAL ,0);
+		
+		double carPace = car.getPace();
+		if(carPace < 1) {
+			moveMap(GameConfig.MOVE_INTERVAL ,0);
+		}
 	}
 	
 	public void moveCar() {
-		
-		double theta = rotationVector.getTheta();
 		double pace = car.getPace();
-		
-		double x = pace * Math.cos(Math.toRadians(-theta + 90));
-		double y = pace * Math.sin(Math.toRadians(-theta + 90));
-		
-		moveMap(x, y);
+		if((int) pace != 0) {
+			double theta = rotationVector.getTheta();
+			
+			double x = pace * Math.cos(Math.toRadians(-theta + 90));
+			double y = pace * Math.sin(Math.toRadians(-theta + 90));
+			
+			moveMap(x, y);
+			this.distance += pace;
+		}
 	}
 	
 	
 	private void moveMap(double x, double y) {
 		
 		ArrayList<Road> roads = this.map.getRoads();
-		ArrayList<Panel> panels = this.map.getPanels();
 
 		
 		for (Road road : roads) {
@@ -85,18 +99,7 @@ public class MobileElementManager {
 			road.setPosition(position);
 		}
 		
-		for(Panel panel : panels) {
-			Position position = panel.getPosition();
-			
-			double xPanel = position.getX();
-			double yPanel = position.getY();
-			
-			position.setX(xPanel + x);
-			position.setY(yPanel + y);
-			
-			panel.setPosition(position);
-		}
-		set(panels, roads);
+		set(roads);
 		
 	}
 	
@@ -120,6 +123,14 @@ public class MobileElementManager {
 	}
 	public double getRotationDegrees() {
 		return rotationVector.getTheta();
+	}
+
+	public int getDistance() {
+		return distance;
+	}
+
+	public void setDistance(int distance) {
+		this.distance = distance;
 	}
 
 }

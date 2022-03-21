@@ -1,17 +1,18 @@
-package data;
+package data.map;
 
 import java.util.ArrayList;
 
 import config.GameConfig;
+import data.geometry.Position;
+import data.map.intersections.Intersection;
 
 public class Map {
 	
 	private ArrayList<Road> roads;
-	private ArrayList<Panel> panels;
+	private ArrayList<Intersection> intersections;
 
-	public Map(ArrayList<Road> roads, ArrayList<Panel> panels) {
+	public Map(ArrayList<Road> roads) {
 		this.roads = roads;
-		this.panels = panels;
 	}
 	
 	public Map() {}
@@ -24,14 +25,6 @@ public class Map {
 
 	public void setRoads(ArrayList<Road> roads) {
 		this.roads = roads;
-	}
-
-	public ArrayList<Panel> getPanels() {
-		return panels;
-	}
-
-	public void setPanels(ArrayList<Panel> panels) {
-		this.panels = panels;
 	}
 
 	public boolean isCarOnLeftBorder(Position position) {

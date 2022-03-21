@@ -1,6 +1,9 @@
-package data;
+package data.mobile;
 
-	/**
+import data.geometry.Position;
+import data.map.MapElement;
+
+/**
 	 * Classe abstraite qui représente un element mobile
 	 * @author Omar CHAKER
 	 * */

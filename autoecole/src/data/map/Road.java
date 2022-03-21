@@ -1,6 +1,7 @@
-package data;
+package data.map;
 
 import config.GameConfig;
+import data.geometry.Position;
 import exceptions.AxisException;
 
 /**
@@ -61,6 +62,25 @@ public class Road extends MapElement {
 		this.line.setPosition(linePosition);
 		
 	}
+	
+	/*private void setPanel() {
+		Position panelPosition = this.panel.getPosition();
+		
+		double x = this.getPosition().getX();
+		double y = this.getPosition().getY();
+		
+		if(this.roadAxis == VERTICAL_AXIS) {
+			panelPosition.setX(x + GameConfig.ROAD_WIDTH + (GameConfig.VERTICAL_ROAD_POSITION_X/2) - (GameConfig.PANEL_WIDTH/2));
+			panelPosition.setY(y + 50);
+		}
+		
+		if(this.roadAxis == HORIZONTAL_AXIS) {
+			panelPosition.setX(x + 50);
+			panelPosition.setY(y + GameConfig.ROAD_WIDTH + (GameConfig.VERTICAL_ROAD_POSITION_X/2) - (GameConfig.PANEL_WIDTH/2));
+		}
+		
+		this.panel.setPosition(panelPosition);
+	}*/
 	
 	public Line getLine() {
 		return line;

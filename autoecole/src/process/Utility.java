@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import data.Position;
+import data.geometry.Position;
 
 /**
  * Cette classe sert d'utilitaire pour ce projet
@@ -44,7 +44,12 @@ public class Utility {
 	
 	/**
 	 * This method returns the center of an object from its position and its width and height
-	 * @param Position of the object and its width and height
+	 * @param objectPosition
+	 * 						 position of the object
+	 * @param objectWidth
+	 * 					  object width
+	 * @param objectHeight
+	 * 					   object height
 	 * @return Position of the center of the object
 	 * */
 

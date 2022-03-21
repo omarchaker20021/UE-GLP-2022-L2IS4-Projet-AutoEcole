@@ -1,4 +1,6 @@
-package data;
+package data.map;
+
+import data.geometry.Position;
 
 public abstract class MapElement {
 

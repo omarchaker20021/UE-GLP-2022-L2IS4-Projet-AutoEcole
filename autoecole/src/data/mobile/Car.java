@@ -1,4 +1,6 @@
-package data;
+package data.mobile;
+
+import data.geometry.Position;
 
 public class Car extends MobileElement {
 	

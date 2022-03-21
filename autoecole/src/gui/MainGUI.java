@@ -13,12 +13,12 @@ import java.awt.event.KeyListener;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.border.Border;
 
 import config.GameConfig;
-import data.Map;
+import data.map.Map;
 import process.GameBuilder;
 import process.MobileElementManager;
 
@@ -38,6 +38,10 @@ public class MainGUI extends JFrame implements Runnable {
 	
 	private GameDisplay dashboard;
 	
+	private JPanel infoPanel;
+	private JLabel pace = new JLabel();
+	JButton button2 = new JButton(" Start ");
+	
 	private boolean stop = true;
 	
 	private MainGUI instance = this;
@@ -54,24 +58,14 @@ public class MainGUI extends JFrame implements Runnable {
 		
 		/** Bordures des panels **/
 		Border lineBorder = BorderFactory.createLineBorder(Color.BLACK);
+
 		
-		
-		JPanel panel1 = new JPanel();
-		JButton button1 = new JButton(" Button ");
-		panel1.setPreferredSize(new Dimension(100, 100));
-		panel1.setLayout(new FlowLayout());
-		panel1.add(button1);
-		contentPane.add(panel1, BorderLayout.EAST);
-		panel1.setBorder(lineBorder);
 		
 		JPanel panel2 = new JPanel();
-		JButton button2 = new JButton(" Start ");
 		button2.addActionListener(new ActionStart());
-		JTextField textField = new JTextField();
-		textField.setColumns(10);
+		button2.setFocusable(false);
 		panel2.setPreferredSize(new Dimension(100, 100));
 		panel2.setLayout(new FlowLayout());
-		panel2.add(textField);
 		panel2.add(button2);
 		contentPane.add(panel2, BorderLayout.SOUTH);
 		panel2.setBorder(lineBorder);
@@ -82,13 +76,23 @@ public class MainGUI extends JFrame implements Runnable {
 		dashboard = new GameDisplay(manager, map);
 		dashboard.setBorder(lineBorder);
 		
+		infoPanel = new JPanel();
+		pace.setText("Pace : " + (int)manager.getCar().getPace() + "km/h");
+		
+		infoPanel.setLayout(new FlowLayout());
+		infoPanel.setPreferredSize(new Dimension(100, 100));
+		infoPanel.setBorder(lineBorder);
+		infoPanel.add(pace);
+		
+		contentPane.add(infoPanel, BorderLayout.EAST);
+		
 		dashboard.setPreferredSize(mapPreferredDimension);
 		dashboard.setBackground(Color.GREEN);
 		contentPane.add(dashboard, BorderLayout.CENTER);
 		
 		KeyControls keyControls = new KeyControls();
-		textField.addKeyListener(keyControls);
-		
+		addKeyListener(keyControls);
+		setFocusable(true);
 		
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		pack();
@@ -107,6 +111,7 @@ public class MainGUI extends JFrame implements Runnable {
 			}
 			manager.moveCar();
 			dashboard.repaint();
+			infoPanel.repaint();
 		}
 	}
 	
@@ -116,10 +121,12 @@ public class MainGUI extends JFrame implements Runnable {
 		public void actionPerformed(ActionEvent e) {
 			if(stop) {
 				stop = false;
+				button2.setText(" Stop ");
 				Thread chronoThread = new Thread(instance);
 				chronoThread.start();
 			}
 			else{
+				button2.setText(" Start ");
 				stop = true;
 			}
 		}
@@ -136,25 +143,26 @@ public class MainGUI extends JFrame implements Runnable {
 
 		@Override
 		public void keyPressed(KeyEvent e) {
-			char typeChar = e.getKeyChar();
+			char typeChar = '0';
+			if(!stop) {
+				typeChar = e.getKeyChar();
+			}
 			switch(typeChar) {
 			case 'z':
 				manager.accelerate();
-				dashboard.repaint();
+				pace.setText("Pace : " + (int)manager.getCar().getPace() + "km/h");
 				break;
 			case 'q':
 				manager.turnLeft();
 				manager.setRotationDegrees(manager.getRotationDegrees() + GameConfig.TURN_RADIAN);
-				dashboard.repaint();
 				break;
 			case 'd':
 				manager.turnRight();
 				manager.setRotationDegrees(manager.getRotationDegrees() - GameConfig.TURN_RADIAN);
-				dashboard.repaint();
 				break;
 			case 's':
 				manager.decelerate();
-				dashboard.repaint();
+				pace.setText("Pace : " + (int)manager.getCar().getPace() + "km/h");
 				break;
 			default :
 				break;
