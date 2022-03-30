@@ -4,9 +4,7 @@ import data.geometry.Position;
 import exceptions.PanelNameException;
 
 
-//Inutilisée
-
-public class Panel extends MapElement {
+public class Panel extends CityElement {
 	
 	
 	/**
@@ -14,7 +12,7 @@ public class Panel extends MapElement {
 	 * */
 	
 	public static final int STOP_PANEL = 0;
-	public static final int PANEL1 = 1;
+	public static final int SPEED_LIMIT_PANEL = 1;
 	public static final int PANEL2 = 2;
 	
 	private int type;

@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import config.GameConfig;
 import data.geometry.Position;
 import data.geometry.Vector;
-import data.map.Map;
+import data.map.City;
 import data.map.Road;
+import data.map.Turning;
+import data.map.intersections.Crossroads;
 import data.mobile.Car;
 
 public class MobileElementManager {
@@ -15,18 +17,20 @@ public class MobileElementManager {
 	
 	private Vector rotationVector = new Vector();
 	
-	private int distance;
+	private double distance;
 		
-	private Map map;
+	private City city;
 
-	public MobileElementManager(Map map) {
-		this.map = map;
+	public MobileElementManager(City city) {
+		this.city = city;
 		this.rotationVector = new Vector(GameConfig.MOVE_INTERVAL, 0);
 		this.distance = 0;
 	}
 	
-	public void set(ArrayList<Road> roads) {
-		this.map.setRoads(roads);
+	public void set(ArrayList<Road> roads, ArrayList<Turning> turnings, ArrayList<Crossroads> crossroadss) {
+		this.city.setRoads(roads);
+		this.city.setTurnings(turnings);
+		this.city.setCrossroadss(crossroadss);
 	}
 	
 	public void set(Car car) {
@@ -56,7 +60,7 @@ public class MobileElementManager {
 		
 		double carPace = car.getPace();
 		if(carPace < 1) {
-			moveMap(GameConfig.MOVE_INTERVAL, 0);
+			moveCity(GameConfig.MOVE_INTERVAL, 0);
 		}
 	}
 	
@@ -64,7 +68,7 @@ public class MobileElementManager {
 		
 		double carPace = car.getPace();
 		if(carPace < 1) {
-			moveMap(GameConfig.MOVE_INTERVAL ,0);
+			moveCity(GameConfig.MOVE_INTERVAL ,0);
 		}
 	}
 	
@@ -76,15 +80,17 @@ public class MobileElementManager {
 			double x = pace * Math.cos(Math.toRadians(-theta + 90));
 			double y = pace * Math.sin(Math.toRadians(-theta + 90));
 			
-			moveMap(x, y);
-			this.distance += pace;
+			moveCity(x, y);
+			this.distance += pace / 6000;
 		}
 	}
 	
 	
-	private void moveMap(double x, double y) {
+	private void moveCity(double x, double y) {
 		
-		ArrayList<Road> roads = this.map.getRoads();
+		ArrayList<Road> roads = this.city.getRoads();
+		ArrayList<Turning> turnings = this.city.getTurnings();
+		ArrayList<Crossroads> crossroadss = this.city.getCrossroadss();
 
 		
 		for (Road road : roads) {
@@ -99,15 +105,40 @@ public class MobileElementManager {
 			road.setPosition(position);
 		}
 		
-		set(roads);
+		for (Turning turning : turnings) {
+			Position position1 = turning.getPosition();
+			
+			double xTurning = position1.getX();
+			double yTurning = position1.getY();
+			
+			position1.setX(xTurning + x);
+			position1.setY(yTurning + y);
+			
+			turning.setPosition(position1);
+		}
+		
+		for (Crossroads crossroads : crossroadss) {
+			Position position2 = crossroads.getPosition();
+			
+			double xCrossroads = position2.getX();
+			double yCrossroads = position2.getY();
+			
+			position2.setX(xCrossroads + x);
+			position2.setY(yCrossroads + y);
+			
+			crossroads.setPosition(position2);
+		}
+		
+		set(roads, turnings, crossroadss);
 		
 	}
+	
 	
 	public Car getCar() {
 		return this.car;
 	}
-	public Map getMap() {
-		return this.map;
+	public City getCity() {
+		return this.city;
 	}
 	
 	public void setRotationVector(Vector rotationVector) {
@@ -125,7 +156,7 @@ public class MobileElementManager {
 		return rotationVector.getTheta();
 	}
 
-	public int getDistance() {
+	public double getDistance() {
 		return distance;
 	}
 

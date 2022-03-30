@@ -2,11 +2,11 @@ package data.map;
 
 import data.geometry.Position;
 
-public abstract class MapElement {
+public abstract class CityElement {
 
 	private Position position;
 	
-	public MapElement(Position position) {
+	public CityElement(Position position) {
 		this.position = position;
 	}
 

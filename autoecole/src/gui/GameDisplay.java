@@ -9,24 +9,39 @@ import javax.swing.JPanel;
 
 import config.GameConfig;
 import data.geometry.Position;
-import data.map.Map;
+import data.map.City;
 import data.mobile.Car;
 import process.MobileElementManager;
 import process.Utility;
+
+
+/**
+ * 
+ * Classe commentée
+ * 
+ * This class organize graphic {@link City} elements of the {@link City} according to an order of drawing components.
+ * 
+ * This class extends {@link JPanel} 
+ * 
+ * @author Omar CHAKER
+ * 
+ * @see JPanel
+ * 
+ * */
 
 public class GameDisplay extends JPanel{
 
 	private static final long serialVersionUID = 1L;
 	
 	
-	private Map map;
+	private City city;
 	private MobileElementManager manager;
 	private PaintStrategy paintStrategy = new PaintStrategy();
 	
 	
-	public GameDisplay(MobileElementManager manager, Map map) {
+	public GameDisplay(MobileElementManager manager, City city) {
 		this.manager = manager;
-		this.map = map;
+		this.city = city;
 	}
 
 
@@ -56,7 +71,7 @@ public class GameDisplay extends JPanel{
 
 		g2D.rotate(Math.toRadians(rotationDegrees), carPosition.getX(), carPosition.getY());
 		
-		paintStrategy.paint(map, g2D);
+		paintStrategy.paint(city, g2D);
 		
 		g2D.setTransform(old);
 		

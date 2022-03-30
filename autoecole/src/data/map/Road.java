@@ -2,40 +2,39 @@ package data.map;
 
 import config.GameConfig;
 import data.geometry.Position;
-import exceptions.AxisException;
 
 /**
  * Classe qui represente une route
  * @author Rayane KHAMAILY
  * */
 
-public class Road extends MapElement {
+public class Road extends CityElement {
 	
 	
 	/** This constant defines the axis of the road which is vertical **/
-	public final static char VERTICAL_AXIS = 'V';
+	public final static int VERTICAL_AXIS = 0;
 	/** This constant defines the axis of the road which is horizontal **/
-	public final static char HORIZONTAL_AXIS = 'H';
+	public final static int HORIZONTAL_AXIS = 1;
 	
-	private char roadAxis;
+	private int axis;
 	private Line line;
+	
+	public Road(Position position) {
+		super(position);
+	}
 	
 	public Road(Position position, Line line) {
 		super(position);
-		this.roadAxis = VERTICAL_AXIS;
+		this.axis = VERTICAL_AXIS;
 		this.line = line;
 		setLine();
 	}
 	
-	public Road(Position position, char axis, Line line) throws AxisException {
+	public Road(Position position, int axis, Line line) {
 		super(position);
-		if(axis == VERTICAL_AXIS || axis == HORIZONTAL_AXIS) {
-			this.roadAxis = axis;
-			this.line = line;
-			setLine();
-		}
-		else
-			throw new AxisException();
+		this.axis = axis;
+		this.line = line;
+		setLine();
 	}
 
 	public void setPosition(Position position) {
@@ -43,18 +42,18 @@ public class Road extends MapElement {
 		setLine();
 	}
 	
-	private void setLine(){
+	public void setLine(){
 		Position linePosition = this.line.getPosition();
 		
 		double x = this.getPosition().getX();
 		double y = this.getPosition().getY();
 		
-		if(this.roadAxis == VERTICAL_AXIS) {
+		if(this.axis == VERTICAL_AXIS) {
 			linePosition.setX(x + (GameConfig.ROAD_WIDTH/2) - (GameConfig.LINE_WIDTH/2));
 			linePosition.setY(y);
 		}
 		
-		if(this.roadAxis == HORIZONTAL_AXIS) {
+		if(this.axis == HORIZONTAL_AXIS) {
 			linePosition.setX(x);
 			linePosition.setY(y + (GameConfig.ROAD_WIDTH/2) - (GameConfig.LINE_WIDTH/2));
 		}
@@ -91,8 +90,12 @@ public class Road extends MapElement {
 	}
 	
 	
-	public char getRoadAxis() {
-		return this.roadAxis;
+	public int getAxis() {
+		return this.axis;
+	}
+	
+	protected void setAxis(int axis) {
+		this.axis = axis;
 	}
 
 }

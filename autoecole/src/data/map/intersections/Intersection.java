@@ -1,13 +1,32 @@
 package data.map.intersections;
 
+import java.util.ArrayList;
+
 import data.geometry.Position;
 import data.map.Line;
-import data.map.MapElement;
+import data.map.CityElement;
+import data.map.Panel;
 
-public interface Intersection {
+public abstract class Intersection extends CityElement {
+	
+	private ArrayList<Panel> panels;
+	
+	
+	public Intersection(Position position) {
+		super(position);
+	}
 
-	public Line getLine();
+	
+	public ArrayList<Panel> getPanels(){
+		return this.panels;
+	}
+	
+	public void setPanels(ArrayList<Panel> panels) {
+		this.panels = panels;
+	}
+	
+	public abstract Line getLine();
 
-	public void setLine(Line line);
+	public abstract void setLine(Line line);
 
 }

@@ -1,14 +1,14 @@
 package data.mobile;
 
 import data.geometry.Position;
-import data.map.MapElement;
+import data.map.CityElement;
 
 /**
 	 * Classe abstraite qui représente un element mobile
 	 * @author Omar CHAKER
 	 * */
 
-public abstract class MobileElement extends MapElement {
+public abstract class MobileElement extends CityElement {
 	
 	private double vitesse;
 	

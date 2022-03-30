@@ -20,9 +20,9 @@ public class GameConfig {
 	public static final int MAP_HEIGHT = 600;
 	
 	/** Largeur de la route **/
-	public static final int ROAD_WIDTH = 40;
+	public static final int ROAD_WIDTH = 400;
 	/** Hauteur de la route **/
-	public static final int ROAD_HEIGHT = 240;
+	public static final int ROAD_HEIGHT = 2400;
 
 	/** Position x de la route **/
 	public static final int VERTICAL_ROAD_POSITION_X = (MAP_WIDTH / 2) - (ROAD_WIDTH / 2);
@@ -58,6 +58,11 @@ public class GameConfig {
 	public static final int STOP_POSITION_X = VERTICAL_ROAD_POSITION_X + ROAD_WIDTH + (VERTICAL_ROAD_POSITION_X/2) - (PANEL_WIDTH/2); 
 	/** Position y du stop **/
 	public static final int STOP_POSITION_Y = 40;
+	
+	/** Largeur du passage piéton **/
+	public static final int PEDESTRIAN_CROSSING_WIDTH = ROAD_WIDTH/10;
+	/** Hauteur du passage piéton **/
+	public static final int PEDESTRIAN_CROSSING_HEIGHT = (ROAD_WIDTH/10)*3;
 	
 	/** Rapidité du jeu **/
 	public static final int GAME_SPEED = 50;

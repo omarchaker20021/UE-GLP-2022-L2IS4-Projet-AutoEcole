@@ -7,7 +7,7 @@ import data.geometry.Position;
  * @author Rayane KHAMAILY
  * */
 
-public class Line extends MapElement {
+public class Line extends CityElement {
 
 	public Line(Position position) {
 		super(position);

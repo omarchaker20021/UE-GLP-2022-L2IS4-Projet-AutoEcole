@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.border.Border;
 
 import config.GameConfig;
-import data.map.Map;
+import data.map.City;
 import process.GameBuilder;
 import process.MobileElementManager;
 
@@ -32,7 +32,7 @@ public class MainGUI extends JFrame implements Runnable {
 	private static final Dimension framePreferredDimension = new Dimension(GameConfig.WINDOW_WIDTH, GameConfig.WINDOW_HEIGHT);
 	private static final Dimension mapPreferredDimension = new Dimension(GameConfig.MAP_WIDTH, GameConfig.MAP_HEIGHT);
 	
-	private Map map;
+	private City city;
 	
 	private MobileElementManager manager;
 	
@@ -40,7 +40,9 @@ public class MainGUI extends JFrame implements Runnable {
 	
 	private JPanel infoPanel;
 	private JLabel pace = new JLabel();
-	JButton button2 = new JButton(" Start ");
+	private JButton button2 = new JButton(" Start ");
+	
+	private JLabel distance = new JLabel();
 	
 	private boolean stop = true;
 	
@@ -71,18 +73,20 @@ public class MainGUI extends JFrame implements Runnable {
 		panel2.setBorder(lineBorder);
 		
 		
-		map = GameBuilder.buildMap();
-		manager = GameBuilder.buildInitMobile(map);
-		dashboard = new GameDisplay(manager, map);
+		city = GameBuilder.buildCity();
+		manager = GameBuilder.buildInitMobile(city);
+		dashboard = new GameDisplay(manager, city);
 		dashboard.setBorder(lineBorder);
 		
 		infoPanel = new JPanel();
 		pace.setText("Pace : " + (int)manager.getCar().getPace() + "km/h");
+		distance.setText("Distance : " + (int)manager.getDistance() + "km");
 		
 		infoPanel.setLayout(new FlowLayout());
 		infoPanel.setPreferredSize(new Dimension(100, 100));
 		infoPanel.setBorder(lineBorder);
 		infoPanel.add(pace);
+		infoPanel.add(distance);
 		
 		contentPane.add(infoPanel, BorderLayout.EAST);
 		
@@ -109,6 +113,8 @@ public class MainGUI extends JFrame implements Runnable {
 			} catch (InterruptedException e) {
 				System.out.println(e.getMessage());
 			}
+			pace.setText("Pace : " + (int)manager.getCar().getPace() + "km/h");
+			distance.setText("Distance : " + (int)manager.getDistance() + "km");
 			manager.moveCar();
 			dashboard.repaint();
 			infoPanel.repaint();
@@ -150,7 +156,6 @@ public class MainGUI extends JFrame implements Runnable {
 			switch(typeChar) {
 			case 'z':
 				manager.accelerate();
-				pace.setText("Pace : " + (int)manager.getCar().getPace() + "km/h");
 				break;
 			case 'q':
 				manager.turnLeft();
@@ -162,7 +167,6 @@ public class MainGUI extends JFrame implements Runnable {
 				break;
 			case 's':
 				manager.decelerate();
-				pace.setText("Pace : " + (int)manager.getCar().getPace() + "km/h");
 				break;
 			default :
 				break;
