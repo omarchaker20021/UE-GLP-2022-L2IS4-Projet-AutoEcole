@@ -39,10 +39,12 @@ public class MainGUI extends JFrame implements Runnable {
 	private GameDisplay dashboard;
 	
 	private JPanel infoPanel;
-	private JLabel pace = new JLabel();
-	private JButton button2 = new JButton(" Start ");
 	
+	private JLabel pace = new JLabel();
 	private JLabel distance = new JLabel();
+	private JLabel errors = new JLabel();
+
+	private JButton button2 = new JButton(" Start ");
 	
 	private boolean stop = true;
 	
@@ -81,12 +83,14 @@ public class MainGUI extends JFrame implements Runnable {
 		infoPanel = new JPanel();
 		pace.setText("Pace : " + (int)manager.getCar().getPace() + "km/h");
 		distance.setText("Distance : " + (int)manager.getDistance() + "km");
+		errors.setText("Errors : ");
 		
 		infoPanel.setLayout(new FlowLayout());
 		infoPanel.setPreferredSize(new Dimension(100, 100));
 		infoPanel.setBorder(lineBorder);
 		infoPanel.add(pace);
 		infoPanel.add(distance);
+		infoPanel.add(errors);
 		
 		contentPane.add(infoPanel, BorderLayout.EAST);
 		

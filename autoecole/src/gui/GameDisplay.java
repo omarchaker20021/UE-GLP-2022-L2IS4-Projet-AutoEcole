@@ -52,6 +52,7 @@ public class GameDisplay extends JPanel{
 		super.paintComponent(g);
 		
 		Graphics2D g2D =(Graphics2D)g;
+		
 		//Activation du antialiasing
 		g2D.setRenderingHint(
                 RenderingHints.KEY_ANTIALIASING, 

@@ -3,17 +3,18 @@ package process;
 import config.GameConfig;
 import data.geometry.Position;
 import data.map.Line;
+import data.map.Panel;
 import data.map.City;
+import data.map.Extension;
 import data.map.Road;
 import data.map.Turning;
 import data.map.intersections.Crossroads;
 import data.map.intersections.PedestrianCrossing;
 import data.mobile.Car;
 import data.mobile.MobileElement;
+import exceptions.PanelNameException;
 
 import java.util.ArrayList;
-
-
 
 /**
  * 
@@ -30,6 +31,9 @@ public class GameBuilder {
 	
 	/**
 	 * This static method initialize the {@link City} of our simulation.
+	 * 
+	 * @return city
+	 * 				The {@link City} with all initialized elements.
 	 * **/
 	
 	public static City buildCity() {
@@ -38,6 +42,10 @@ public class GameBuilder {
 		ArrayList<Turning> turnings = new ArrayList<Turning>();
 		
 		ArrayList<Crossroads> crossroadss = new ArrayList<Crossroads>();
+		
+		ArrayList<Extension> extensions = new ArrayList<Extension>();
+		
+		Car secondaryCar = generateSecondaryCar();
 		
 		double x0 = GameConfig.VERTICAL_ROAD_POSITION_X;
 		double y0 = GameConfig.MAP_HEIGHT - GameConfig.ROAD_WIDTH;
@@ -53,11 +61,17 @@ public class GameBuilder {
 		
 		Position position2 = new Position(x0 - GameConfig.ROAD_HEIGHT - GameConfig.ROAD_WIDTH, y0 - GameConfig.ROAD_HEIGHT - GameConfig.ROAD_WIDTH);
 		
+		Position position3 = new Position(x0, y0 - (GameConfig.ROAD_HEIGHT + GameConfig.ROAD_WIDTH));
+		
+		Position position4 = new Position(x0, y0 - 2*(GameConfig.ROAD_HEIGHT + GameConfig.ROAD_WIDTH));
 		
 		roads.addAll(generateRoads(nbVerticalRoads, nbHorizontalRoads, position));
 		
 		roads.addAll(generateRoads(nbVerticalRoads, nbHorizontalRoads, position2));
 		
+		roads.addAll(generateRoads(nbVerticalRoads, 0, position3));
+		
+		roads.addAll(generateRoads(nbVerticalRoads, 0, position4));
 		
 		//Creation of last horizontal and vertical roads of the map(and the turning which link them).
 		
@@ -70,12 +84,13 @@ public class GameBuilder {
 		
 		//City creation
 		
-		City city = new City(roads, turnings, crossroadss);
+		City city = new City(roads, turnings, crossroadss, extensions, secondaryCar);
 		
 		// Generate a crossroads at the position of intersection of 4 roads.
-		Position crossroadsPosition = new Position(x0 - GameConfig.ROAD_HEIGHT - GameConfig.ROAD_WIDTH, y0 - GameConfig.ROAD_HEIGHT - GameConfig.ROAD_WIDTH); 
-				
-		crossroadss.add(generateCrossroads(city, crossroadsPosition));
+		
+		crossroadss.addAll(generateCrossroadss(city));
+		
+		city.setCrossroadss(crossroadss);
 		
 		//Automatic generation of turnings
 		
@@ -83,17 +98,28 @@ public class GameBuilder {
 		
 		city.setTurnings(turnings);
 		
+		//Automatic generate of road extensions
+		
+		extensions.addAll(generateExtensions(city));
+		
+		city.setExtensions(extensions);
+		
+		//Generate panels
+		
+		generatePanels(crossroadss);
+		
+		
 		return city;
 	}
 
 	/**
-	 * This static method initialize all {@link MobileElement}s of our simulation.
+	 * This static method builds all {@link MobileElement}s of our simulation.
 	 * 
 	 * @param city
 	 * 				The {@link City} of the simulation.
 	 * @return manager
 	 * 					A {@link MobileElementManager} object.
-	 * **/
+	 * */
 	
 	public static MobileElementManager buildInitMobile(City city) {
 		MobileElementManager manager = new MobileElementManager(city);
@@ -103,6 +129,14 @@ public class GameBuilder {
 		return manager;
 	}
 	
+	/**
+	 * This static method initialize the {@link Car}.
+	 * 
+	 * @param manager
+	 * 				A {@link MobileElementManager} object.
+	 * 
+	 * */
+	
 	private static void initializeCar(MobileElementManager manager){
 		Position position = new Position(GameConfig.CAR_POSITION_X, GameConfig.CAR_POSITION_Y);
 		
@@ -110,6 +144,30 @@ public class GameBuilder {
 		
 		manager.set(car);
 		
+	}
+	
+	/**
+	 * This static method initialize secondary {@link Car}.
+	 * 
+	 * @param manager
+	 * 				A {@link MobileElementManager} object.
+	 * 
+	 * */
+	
+	private static Car generateSecondaryCar(){
+		
+		double x0 = GameConfig.VERTICAL_ROAD_POSITION_X;
+		double y0 = GameConfig.MAP_HEIGHT - GameConfig.ROAD_WIDTH;
+		
+		Position position = new Position(x0 - GameConfig.ROAD_WIDTH, 
+				y0 - GameConfig.ROAD_HEIGHT - GameConfig.ROAD_WIDTH + 20);
+		
+		//Position lastHorizontalRoadPosition = new Position(x0,
+		//			y0 - GameConfig.ROAD_HEIGHT - GameConfig.ROAD_WIDTH);
+		
+		Car secondaryCar = new Car(position);
+		
+		return secondaryCar;
 	}
 	
 	/**
@@ -195,7 +253,9 @@ public class GameBuilder {
 				
 				Position turning1Position = turning1.getPosition();
 				
-				if(turning1Position != null && !Utility.doesTurningExists(turnings, turning1Position)) {
+				if(turning1Position != null 
+						&& !Utility.doesCityElementExists(city, turning1Position)
+						&& !Utility.doesTurningExists(turnings, turning1Position)) {
 					turnings.add(turning1);
 				}
 			}
@@ -204,7 +264,9 @@ public class GameBuilder {
 				Turning turning2 = twoTurnings.get(1);
 				Position turning2Position = turning2.getPosition();
 			
-				if(turning2Position != null && !Utility.doesTurningExists(turnings, turning2Position)) {
+				if(turning2Position != null 
+						&& !Utility.doesCityElementExists(city, turning2Position)
+						&& !Utility.doesTurningExists(turnings, turning2Position)) {
 					turnings.add(turning2);
 				}
 			}
@@ -215,8 +277,7 @@ public class GameBuilder {
 	}
 	
 	/**
-	 * This static method find the type of {@link Turning} which match with the {@link Road}s
-	 * which are created from a {@link Position}.
+	 * This static method generates a {@link Turning}.
 	 * @param city
 	 * 				the {@link City}.
 	 * @param position
@@ -350,55 +411,105 @@ public class GameBuilder {
 	
 	
 	/**
-	 * This method generates automatically {@link Crossroads}.
+	 * This method generates one or two {@link Crossroads} according to 
+	 * the {@link Position} of created {@link Road}s.
 	 * 
-	 * @param roads
-	 * 				an {@link ArrayList} of {@link Road}s.
+	 * @param city
+	 * 				The {@link City}.
 	 * 
 	 * @param roadPosition
-	 * 							the {@link Position} of the {@link Crossroads} generated.
-	 * 
-	 * @param pedestrianCrossingNumber
-	 * 									a constant of {@link Crossroads}.
+	 * 						The {@link Position} of the {@link Crossroads} generated.
 	 * 
 	 * @return crossroads
-	 * 						the generated {@link Crossroads}.
+	 * 						The generated {@link Crossroads}.
 	 * 
 	 * */
 	
-	private static Crossroads generateCrossroads(City city, Position roadPosition) {
+	private static ArrayList<Crossroads> generateCrossroads(City city, Position roadPosition) {
 		
 		ArrayList<Road> roads = city.getRoads();
 		
-		ArrayList<PedestrianCrossing> pCs = new ArrayList<PedestrianCrossing>();
+		ArrayList<Crossroads> crossroadss = new ArrayList<Crossroads>(2);
 		
 		double x = roadPosition.getX();
 		double y = roadPosition.getY();
 		
-		/*if(Utility.doesRoadExists(roads, roadPosition)) {
+		Position topCrossroadsPosition = new Position(x, y - GameConfig.ROAD_WIDTH);
+		Position bottomCrossroadsPosition = new Position(x, y + GameConfig.ROAD_HEIGHT);
+		
+		if(Utility.doesRoadExists(roads, roadPosition)) {
 			Road road = Utility.getRoadFromPosition(roads, roadPosition);
 			int roadType = road.getAxis();
 			
 			if(roadType == Road.VERTICAL_AXIS) {
 				
-				Position TopLeftHorizontalRoadPosition = new Position(x - GameConfig.ROAD_HEIGHT, y - GameConfig.ROAD_WIDTH);
-				Position TopRightHorizontalRoadPosition = new Position(x + GameConfig.ROAD_WIDTH, y - GameConfig.ROAD_HEIGHT);
-				Position TopVerticalRoadPosition = new Position(x - GameConfig.ROAD_HEIGHT - GameConfig.ROAD_WIDTH, y);
+				Position topLeftHorizontalRoadPosition = new Position(x - GameConfig.ROAD_HEIGHT, y - GameConfig.ROAD_WIDTH);
+				Position topRightHorizontalRoadPosition = new Position(x + GameConfig.ROAD_WIDTH, y - GameConfig.ROAD_WIDTH);
+				Position topVerticalRoadPosition = new Position(x, y - GameConfig.ROAD_HEIGHT - GameConfig.ROAD_WIDTH);
 				
-				Position BottomLeftHorizontalRoadPosition = new Position(x - GameConfig.ROAD_HEIGHT, y + GameConfig.ROAD_HEIGHT);
-				Position BottomRightHorizontalRoadPosition = new Position(x + GameConfig.ROAD_WIDTH, y + GameConfig.ROAD_HEIGHT);
-				Position BottomVerticalRoadPosition = new Position(x + GameConfig.ROAD_HEIGHT + GameConfig.ROAD_WIDTH, y);
+				Position bottomLeftHorizontalRoadPosition = new Position(x - GameConfig.ROAD_HEIGHT, y + GameConfig.ROAD_HEIGHT);
+				Position bottomRightHorizontalRoadPosition = new Position(x + GameConfig.ROAD_WIDTH, y + GameConfig.ROAD_HEIGHT);
+				Position bottomVerticalRoadPosition = new Position(x, y + GameConfig.ROAD_HEIGHT + GameConfig.ROAD_WIDTH);
 				
 				
-				if(Utility.doesRoadExists(roads, TopLeftHorizontalRoadPosition)
-						&& Utility.doesRoadExists(roads, TopVerticalRoadPosition)
-						&& Utility.doesRoadExists(roads, TopRightHorizontalRoadPosition)) {
+				//Use of boolean variables to make readable these if expressions.
+				
+				boolean a = Utility.doesRoadExists(roads, topLeftHorizontalRoadPosition);  
+				boolean b = Utility.doesRoadExists(roads, topRightHorizontalRoadPosition);
+				boolean c = Utility.doesRoadExists(roads, topVerticalRoadPosition);
+				
+				if(b && (a || c)) {
+					
+					//Generate pedestrian crossings.
+					
+					ArrayList<PedestrianCrossing> pCs = new ArrayList<PedestrianCrossing>();
+					
+					//vertical pedestrian crossing at the west of the crossroads position.
+					
+					double x1 = topCrossroadsPosition.getX();
+					double y1 = topCrossroadsPosition.getY();
+					
+					x1 += GameConfig.ROAD_WIDTH;
+					
+					Position pC1Position = new Position(x1, y1);
+					int pC1Axis = PedestrianCrossing.VERTICAL_AXIS;
+					
+					PedestrianCrossing pC1 = new PedestrianCrossing(pC1Position, pC1Axis);
+					
+					pCs.add(pC1);
+					
+					//horizontal pedestrian crossing at the south of the crossroads position.
+					
+					double x2 = topCrossroadsPosition.getX();
+					double y2 = topCrossroadsPosition.getY();
+					
+					y2 += GameConfig.ROAD_WIDTH; 
+					
+					Position pC2Position = new Position(x2, y2);
+					int pC2Axis = PedestrianCrossing.HORIZONTAL_AXIS;
+					
+					PedestrianCrossing pC2 = new PedestrianCrossing(pC2Position, pC2Axis);
+					
+					pCs.add(pC2);
+					
+
+					//Generate a crossroads.
+					Crossroads crossroads1 = new Crossroads(topCrossroadsPosition, pCs);
+					
+					crossroadss.add(crossroads1);
+					
+				}
+				else if(a && c) {
+					
+					//Generate pedestrian crossings.
+					
+					ArrayList<PedestrianCrossing> pCs = new ArrayList<PedestrianCrossing>();
 					
 					//vertical pedestrian crossing at the east of the crossroads position.
-					double x1 = roadPosition.getX();
-					double y1 = roadPosition.getY();
+					double x1 = topCrossroadsPosition.getX();
+					double y1 = topCrossroadsPosition.getY();
 					
-					x1 -= (GameConfig.PEDESTRIAN_CROSSING_HEIGHT + GameConfig.ROAD_WIDTH);
+					x1 -= GameConfig.PEDESTRIAN_CROSSING_HEIGHT;
 					
 					Position pC1Position = new Position(x1, y1);
 					int pC1Axis = PedestrianCrossing.VERTICAL_AXIS;
@@ -409,8 +520,8 @@ public class GameBuilder {
 					
 					//horizontal pedestrian crossing at the north of the crossroads position.
 					
-					double x2 = roadPosition.getX();
-					double y2 = roadPosition.getY();
+					double x2 = topCrossroadsPosition.getX();
+					double y2 = topCrossroadsPosition.getY();
 					
 					y2 -= GameConfig.PEDESTRIAN_CROSSING_HEIGHT;
 					
@@ -421,134 +532,118 @@ public class GameBuilder {
 					
 					pCs.add(pC2);
 					
+					//Generate a crossroads.
+					Crossroads crossroads1 = new Crossroads(topCrossroadsPosition, pCs);
+					
+					crossroadss.add(crossroads1);
+					
+				}
+				
+				a = Utility.doesRoadExists(roads, bottomLeftHorizontalRoadPosition);  
+				b = Utility.doesRoadExists(roads, bottomRightHorizontalRoadPosition);
+				boolean d = Utility.doesRoadExists(roads, bottomVerticalRoadPosition);
+				
+
+				if(b && d) {
+					
+					//Generate pedestrian crossings.
+					
+					ArrayList<PedestrianCrossing> pCs = new ArrayList<PedestrianCrossing>();
+					
 					//vertical pedestrian crossing at the west of the crossroads position.
 					
-					double x3 = roadPosition.getX();
-					double y3 = roadPosition.getY();
+					double x1 = bottomCrossroadsPosition.getX();
+					double y1 = bottomCrossroadsPosition.getY();
 					
-					x3 += GameConfig.ROAD_WIDTH;
+					x1 += GameConfig.ROAD_WIDTH;
 					
-					Position pC3Position = new Position(x3, y3);
-					int pC3Axis = PedestrianCrossing.VERTICAL_AXIS;
+					Position pC1Position = new Position(x1, y1);
+					int pC1Axis = PedestrianCrossing.VERTICAL_AXIS;
 					
-					PedestrianCrossing pC3 = new PedestrianCrossing(pC3Position, pC3Axis);
+					PedestrianCrossing pC1 = new PedestrianCrossing(pC1Position, pC1Axis);
 					
-					pCs.add(pC3);
+					pCs.add(pC1);
 					
 					//horizontal pedestrian crossing at the south of the crossroads position.
 					
-					double x4 = roadPosition.getX();
-					double y4 = roadPosition.getY();
+					double x2 = bottomCrossroadsPosition.getX();
+					double y2 = bottomCrossroadsPosition.getY();
 					
-					y4 += GameConfig.ROAD_WIDTH;
+					y2 += GameConfig.ROAD_WIDTH;
 					
-					Position pC4Position = new Position(x4, y4);
-					int pC4Axis = PedestrianCrossing.HORIZONTAL_AXIS;
+					Position pC2Position = new Position(x2, y2);
+					int pC2Axis = PedestrianCrossing.HORIZONTAL_AXIS;
 					
-					PedestrianCrossing pC4 = new PedestrianCrossing(pC4Position, pC4Axis);
+					PedestrianCrossing pC2 = new PedestrianCrossing(pC2Position, pC2Axis);
 					
-					pCs.add(pC4);
+					pCs.add(pC2);
 					
+
+					//Generate a crossroads.
+					Crossroads crossroads2 = new Crossroads(bottomCrossroadsPosition, pCs);
+					
+					crossroadss.add(crossroads2);
+					
+				}
+				
+				else if(a && (b || d)) {
+					
+					//Generate pedestrian crossings.
+					
+					ArrayList<PedestrianCrossing> pCs = new ArrayList<PedestrianCrossing>();
+					
+					//vertical pedestrian crossing at the east of the crossroads position.
+					double x1 = bottomCrossroadsPosition.getX();
+					double y1 = bottomCrossroadsPosition.getY();
+					
+					x1 -= GameConfig.PEDESTRIAN_CROSSING_HEIGHT;
+					
+					Position pC1Position = new Position(x1, y1);
+					int pC1Axis = PedestrianCrossing.VERTICAL_AXIS;
+					
+					PedestrianCrossing pC1 = new PedestrianCrossing(pC1Position, pC1Axis); 
+					
+					pCs.add(pC1);
+					
+					//horizontal pedestrian crossing at the north of the crossroads position.
+					
+					double x2 = bottomCrossroadsPosition.getX();
+					double y2 = bottomCrossroadsPosition.getY();
+					
+					y2 -= GameConfig.PEDESTRIAN_CROSSING_HEIGHT;
+					
+					Position pC2Position = new Position(x2, y2);
+					int pC2Axis = PedestrianCrossing.HORIZONTAL_AXIS;
+					
+					PedestrianCrossing pC2 = new PedestrianCrossing(pC2Position, pC2Axis);
+					
+					pCs.add(pC2);
+					
+					//Generate a crossroads.
+					Crossroads crossroads2 = new Crossroads(bottomCrossroadsPosition, pCs);
+					
+					crossroadss.add(crossroads2);
 					
 				}
 				
 			}
-			
-		}*/
+		}
 		
 		
-		Position LeftTopVerticalRoadPosition = new Position(x, y - GameConfig.ROAD_HEIGHT);
-		Position LeftBottomVerticalRoadPosition = new Position(x, y + GameConfig.ROAD_WIDTH);
-		Position RightTopVerticalRoadPosition = new Position(x, y - GameConfig.ROAD_HEIGHT);
-		Position RightBottomVerticalRoadPosition = new Position(x, y + GameConfig.ROAD_WIDTH);
-		
-		
-		/*if(Utility.doesRoadExists(roads, TopVerticalRoadPosition)
-				&& Utility.doesRoadExists(roads, BottomVerticalRoadPosition)
-				&& Utility.doesRoadExists(roads, RightHorizontalRoadPosition)
-				&& Utility.doesRoadExists(roads, LeftHorizontalRoadPosition)) {
-			*/
-			//Generate pedestrian crossings.
-			
-			//vertical pedestrian crossing at the east of the crossroads position.
-			double x1 = roadPosition.getX();
-			double y1 = roadPosition.getY();
-			
-			x1 -= GameConfig.PEDESTRIAN_CROSSING_HEIGHT;
-			
-			Position pC1Position = new Position(x1, y1);
-			int pC1Axis = PedestrianCrossing.VERTICAL_AXIS;
-			
-			PedestrianCrossing pC1 = new PedestrianCrossing(pC1Position, pC1Axis); 
-			
-			pCs.add(pC1);
-			
-			//horizontal pedestrian crossing at the north of the crossroads position.
-			
-			double x2 = roadPosition.getX();
-			double y2 = roadPosition.getY();
-			
-			y2 -= GameConfig.PEDESTRIAN_CROSSING_HEIGHT;
-			
-			Position pC2Position = new Position(x2, y2);
-			int pC2Axis = PedestrianCrossing.HORIZONTAL_AXIS;
-			
-			PedestrianCrossing pC2 = new PedestrianCrossing(pC2Position, pC2Axis);
-			
-			pCs.add(pC2);
-			
-			//vertical pedestrian crossing at the west of the crossroads position.
-			
-			double x3 = roadPosition.getX();
-			double y3 = roadPosition.getY();
-			
-			x3 += GameConfig.ROAD_WIDTH;
-			
-			Position pC3Position = new Position(x3, y3);
-			int pC3Axis = PedestrianCrossing.VERTICAL_AXIS;
-			
-			PedestrianCrossing pC3 = new PedestrianCrossing(pC3Position, pC3Axis);
-			
-			pCs.add(pC3);
-			
-			//horizontal pedestrian crossing at the south of the crossroads position.
-			
-			double x4 = roadPosition.getX();
-			double y4 = roadPosition.getY();
-			
-			y4 += GameConfig.ROAD_WIDTH;
-			
-			Position pC4Position = new Position(x4, y4);
-			int pC4Axis = PedestrianCrossing.HORIZONTAL_AXIS;
-			
-			PedestrianCrossing pC4 = new PedestrianCrossing(pC4Position, pC4Axis);
-			
-			pCs.add(pC4);
-		//}
-		
-		
-		
-		//Generate a crossroads.
-		Crossroads crossroads = new Crossroads(roadPosition, pCs);
-		
-		crossroads.setPedestrianCrossings(pCs);
-		
-		
-		
-		return crossroads;
+		return crossroadss;
 	}
 	
 	/**
-	 * This static method generates automatically {@link Crossroads}s accorded to the {@link Road}s created
+	 * This static method generates automatically {@link Crossroads}s accorded to {@link Road}s created
 	 * in the {@link City}.
 	 * 
 	 * @param city
 	 * 				the {@link City}.
-	 * @return turnings
-	 * 					{@link Turning}s of all {@link City}.
+	 * @return crossroadss
+	 * 					{@link Crossroads}s of the whole {@link City}.
 	 * */
 	
-	/*private static ArrayList<Crossroads> generateCrossroadss(City city){
+	private static ArrayList<Crossroads> generateCrossroadss(City city){
 		
 		ArrayList<Crossroads> crossroadss = new ArrayList<Crossroads>();
 		
@@ -557,34 +652,242 @@ public class GameBuilder {
 		for (Road road : roads) {
 			Position roadPosition = road.getPosition();
 			
-			ArrayList<Turning> twoTurnings = generateCrossroads(city, roadPosition);
+			ArrayList<Crossroads> crossroadss2 = generateCrossroads(city, roadPosition);
 			
-			if(!twoTurnings.isEmpty()) {
-				Turning turning1 = twoTurnings.get(0);
+			if(!crossroadss2.isEmpty()) {
+				Crossroads crossroads1 = crossroadss2.get(0);
 				
-				Position turning1Position = turning1.getPosition();
+				Position crossroads1Position = crossroads1.getPosition();
 				
-				if(turning1Position != null && !Utility.doesTurningExists(turnings, turning1Position)) {
-					turnings.add(turning1);
+				if(crossroads1Position != null 
+						&& !Utility.doesCityElementExists(city, crossroads1Position)
+						&& !Utility.doesCrossroadsExists(crossroadss, crossroads1Position)) {
+					crossroadss.add(crossroads1);
+				}
+				if(crossroadss2.size() == 2) {
+					Crossroads crossroads2 = crossroadss2.get(1);
+					Position crossroads2Position = crossroads2.getPosition();
+				
+					if(crossroads2Position != null 
+							&& !Utility.doesCityElementExists(city, crossroads2Position)
+							&& !Utility.doesCrossroadsExists(crossroadss, crossroads2Position)) {
+						crossroadss.add(crossroads2);
+					}
 				}
 			}
+		}
+		
+		return crossroadss;
+	}
+	
+	/**
+	 * This method generates an extension of a road to fill voids between 2 roads of the same axis
+	 * 
+	 * @param city
+	 * 				The {@link City}.
+	 * @param roadPosition
+	 * 						{@link Road}'s {@link Position}.
+	 * @return extension
+	 * 					An {@link Extension}.
+	 * */
+	
+	private static Extension generateExtension(City city, Position roadPosition) {
+		
+		ArrayList<Road> roads = city.getRoads();
+		
+		double x = roadPosition.getX();
+		double y = roadPosition.getY();
+		
+		if(Utility.doesRoadExists(roads, roadPosition)) {
 			
-			if(twoTurnings.size() == 2) {
-				Turning turning2 = twoTurnings.get(1);
-				Position turning2Position = turning2.getPosition();
+			Road road = Utility.getRoadFromPosition(roads, roadPosition);
+			int roadType = road.getAxis();
 			
-				if(turning2Position != null && !Utility.doesTurningExists(turnings, turning2Position)) {
-					turnings.add(turning2);
+			if(roadType == Road.HORIZONTAL_AXIS) {
+				
+				//next horizontal road position to the west
+				Position nextHorizontalRoadPosition = new Position(x + GameConfig.ROAD_HEIGHT + GameConfig.ROAD_WIDTH, y);
+				
+				if(Utility.doesRoadExists(roads, nextHorizontalRoadPosition)) {
+					
+					Line line = new Line();
+					
+					double xExtension = x + GameConfig.ROAD_HEIGHT;
+					double yExtension = y;
+					
+					Position extensionPosition = new Position(xExtension, yExtension);
+					
+					int extensionAxis = Extension.HORIZONTAL_AXIS;
+					
+					Extension extension = new Extension(extensionPosition, extensionAxis, line);
+					
+					return extension;
 				}
+				
+				
+			}
+			else if(roadType == Road.VERTICAL_AXIS) {
+				
+				//next vertical road position to the south
+				Position nextVerticalRoadPosition = new Position(x, y + GameConfig.ROAD_HEIGHT + GameConfig.ROAD_WIDTH);
+				
+				if(Utility.doesRoadExists(roads, nextVerticalRoadPosition)) {
+					
+					Line line = new Line();
+					
+					double xExtension = x;
+					double yExtension = y + GameConfig.ROAD_HEIGHT;
+					
+					Position extensionPosition = new Position(xExtension, yExtension);
+					
+					int extensionAxis = Extension.VERTICAL_AXIS;
+					
+					Extension extension = new Extension(extensionPosition, extensionAxis, line);
+					
+					return extension;
+					
+				}
+
 			}
 			
 		}
 		
+		return null;
 		
-	}*/
+	}
 	
+	/**
+	 * This method generates {@link Extension}s automatically.
+	 * 
+	 * @param city
+	 * 				The {@link City}.
+	 * 
+	 * @return extensions
+	 * 						An {@link ArrayList} of {@link Extension}s.
+	 * 
+	 * */
 	
+	private static ArrayList<Extension> generateExtensions(City city) {
+		ArrayList<Road> roads = city.getRoads();
+		
+		ArrayList<Extension> extensions = new ArrayList<Extension>();
+		
+		for (Road road : roads) {
+			Position roadPosition = road.getPosition();
+
+			if(generateExtension(city, roadPosition) != null) {
+				
+				Extension extension = generateExtension(city, roadPosition);
+				
+				Position extensionPosition = extension.getPosition();
+				
+				if(!Utility.doesExtensionExists(extensions, extensionPosition)
+						&& !Utility.doesCityElementExists(city, extensionPosition)) {
+					extensions.add(extension);
+				}
+				
+			}
+		}
+		
+		return extensions;
+	}
 	
+	/**
+	 * This method generates {@link Panel}s according to a {@link PedestrianCrossing} positions 
+	 * in a {@link Crossroads}.
+	 * 
+	 * @param city
+	 * 				The {@link City}.
+	 * 
+	 * @return panels
+	 * 				An {@link ArrayList} of {@link Panel}s.
+	 * 
+	 * */
 	
+	private static ArrayList<Panel> generateCrossroadsPanels(Crossroads crossroads, Position crossroadsPosition) {
+		
+		ArrayList<Panel> panels = new ArrayList<Panel>();
 	
+		ArrayList<PedestrianCrossing> pedestrianCrossings = crossroads.getPedestrianCrossings();
+		
+		PedestrianCrossing verticalPC = pedestrianCrossings.get(0);
+		PedestrianCrossing horizontalPC = pedestrianCrossings.get(1);
+		
+		Position verticalPCPosition = verticalPC.getPosition();
+		
+		double x1 = verticalPCPosition.getX();
+		double y1 = verticalPCPosition.getY();
+		
+		Position horizontalPCPosition = horizontalPC.getPosition();
+		
+		double x2 = horizontalPCPosition.getX();
+		double y2 = horizontalPCPosition.getY();
+		
+		Position panel1Position = new Position(0, 0);
+		Position panel2Position = new Position(0, 0);
+		
+		
+		if(Utility.getCrossroadsType(crossroads) == Utility.CROSSROADS_1) {
+			
+			panel1Position.setX(x1 - GameConfig.PEDESTRIAN_CROSSING_HEIGHT*2);
+			panel1Position.setY(y1 
+					+ GameConfig.PEDESTRIAN_CROSSING_WIDTH*8
+					+ GameConfig.ROAD_WIDTH/2 
+					- GameConfig.PANEL_WIDTH/2);
+			
+			panel2Position.setX(x2 
+					- GameConfig.PEDESTRIAN_CROSSING_HEIGHT
+					- GameConfig.PANEL_WIDTH/2);
+			panel2Position.setY(y2 - GameConfig.PEDESTRIAN_CROSSING_HEIGHT*2);
+		}
+		else if(Utility.getCrossroadsType(crossroads) == Utility.CROSSROADS_2) {
+
+			panel1Position.setX(x1 + GameConfig.PEDESTRIAN_CROSSING_HEIGHT);
+			panel1Position.setY(y1 
+					- GameConfig.PEDESTRIAN_CROSSING_WIDTH*8);
+			
+			panel2Position.setX(x2
+					+ GameConfig.PEDESTRIAN_CROSSING_WIDTH*8
+					+ GameConfig.ROAD_WIDTH/2 
+					- GameConfig.PANEL_WIDTH/2);
+			panel2Position.setY(y2 
+					+ GameConfig.PEDESTRIAN_CROSSING_WIDTH);
+			
+		}
+		
+		try {
+			
+			panels.add(new Panel(Panel.STOP_PANEL, panel1Position));
+			panels.add(new Panel(Panel.STOP_PANEL, panel2Position));
+		
+		}
+		catch (PanelNameException e) {
+			e.printStackTrace();
+		}
+		
+		return panels;
+	}
+	
+	/**
+	 * This method generates all {@link City} {@link Panel}s.
+	 * 
+	 * @param crossroads
+	 * 				An {@link ArrayList} of {@link Crossroads}s.
+	 * 
+	 * @return panels
+	 * 				An {@link ArrayList} of {@link Panel}s.
+	 * */
+	
+	private static void generatePanels(ArrayList<Crossroads> crossroadss){
+		
+		for (Crossroads crossroads : crossroadss) {
+			ArrayList<Panel> panels = new ArrayList<Panel>();
+			
+			Position crossroadsPosition = crossroads.getPosition();
+			
+			panels.addAll(generateCrossroadsPanels(crossroads, crossroadsPosition));
+			
+			crossroads.setPanels(panels);
+		}
+	}
 }

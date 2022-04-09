@@ -5,21 +5,39 @@ import java.util.ArrayList;
 import config.GameConfig;
 import data.geometry.Position;
 import data.map.intersections.*;
+import data.mobile.Car;
 
 public class City {
 	
 	private ArrayList<Road> roads;
+	private ArrayList<Extension> extensions;
 	private ArrayList<Crossroads> crossroadss;
 	private ArrayList<Turning> turnings;
 	private ArrayList<Roundabout> roundabouts;
+	
+	private Car secondaryCar;
 
-	public City(ArrayList<Road> roads, ArrayList<Turning> turnings, ArrayList<Crossroads> crossroadss) {
+	public City(ArrayList<Road> roads, 
+			ArrayList<Turning> turnings, 
+			ArrayList<Crossroads> crossroadss, 
+			ArrayList<Extension> extensions) {
+		
 		this.roads = roads;
 		this.turnings = turnings;
 		this.crossroadss = crossroadss;
+		this.extensions = extensions;
+	
 	}
 	
-	public City() {}
+	public City(ArrayList<Road> roads, 
+			ArrayList<Turning> turnings, 
+			ArrayList<Crossroads> crossroadss, 
+			ArrayList<Extension> extensions, 
+			Car secondaryCar) {
+		this(roads, turnings, crossroadss, extensions);
+		
+		this.secondaryCar = secondaryCar;
+	}
 	
 	
 	
@@ -128,6 +146,22 @@ public class City {
 		}
 		
 		return false;
+	}
+
+	public ArrayList<Extension> getExtensions() {
+		return extensions;
+	}
+
+	public void setExtensions(ArrayList<Extension> extensions) {
+		this.extensions = extensions;
+	}
+
+	public Car getSecondaryCar() {
+		return secondaryCar;
+	}
+
+	public void setSecondaryCar(Car secondaryCar) {
+		this.secondaryCar = secondaryCar;
 	}
 
 }

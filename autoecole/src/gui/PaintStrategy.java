@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.util.ArrayList;
 
@@ -11,6 +12,7 @@ import config.GameConfig;
 import data.geometry.Position;
 import data.map.Line;
 import data.map.City;
+import data.map.Extension;
 import data.map.Panel;
 import data.map.Road;
 import data.map.Turning;
@@ -60,6 +62,10 @@ public class PaintStrategy {
 		ArrayList<Road> roads = city.getRoads();
 		ArrayList<Turning> turnings = city.getTurnings();
 		ArrayList<Crossroads> crossroadss = city.getCrossroadss();
+		ArrayList<Extension> extensions = city.getExtensions();
+		Car secondaryCar = city.getSecondaryCar();
+		
+		//Paint roads
 		
 		for (Road road : roads) {
 			
@@ -73,6 +79,8 @@ public class PaintStrategy {
 			}
 		
 		}
+		
+		//Paint turnings
 		
 		for (Turning turning : turnings) {
 			int turningAxis = turning.getAxis();
@@ -93,15 +101,34 @@ public class PaintStrategy {
 			
 		}
 		
+		//Paint crossroads
+		
 		for (Crossroads crossroads : crossroadss) {
 			paintCrossroads(crossroads, g);
 		}
 		
+		//Paint extensions
+		
+		for (Extension extension : extensions) {
+			paintExtension(extension, g);
+		}
+		
+		//Paint the secondary car
+		
+		paintSecondaryCar(secondaryCar, g);
+		
 	}
 	
 	/**
-	 * This method paint the main car
-	 * @param a car and a Graphics object
+	 * This method paint the main {@link Car}.
+	 * 
+	 * @param car
+	 * 			A {@link Car}. 
+	 * 
+	 * @param g
+	 * 			A {@link Graphics} object
+	 * 
+	 * 
 	 * */	
 
 	public void paint(Car car, Graphics g) {
@@ -114,6 +141,35 @@ public class PaintStrategy {
 		g.drawImage(Utility.readImage("src/images/mercedes.png"), x, y, GameConfig.CAR_WIDTH, GameConfig.CAR_HEIGHT, null);
 		
 	}
+	
+	
+	/**
+	 * This method paint the secondary {@link Car}.
+	 * 
+	 * @param secondaryCar
+	 * 			A {@link Car}. 
+	 * 
+	 * @param g
+	 * 			A {@link Graphics} object
+	 * 
+	 * 
+	 * */	
+
+	private void paintSecondaryCar(Car secondaryCar, Graphics g) {
+		Position position = secondaryCar.getPosition();
+		
+		int x = (int)position.getX();
+		int y = (int)position.getY();
+		
+		Graphics2D g2D = (Graphics2D)g;
+		
+		Position centerCar = Utility.getObjectCenter(position, GameConfig.ROAD_WIDTH/3, GameConfig.ROAD_HEIGHT/11);
+
+		g2D.rotate(Math.toRadians(90), centerCar.getX(), centerCar.getY());
+		g.drawImage(Utility.readImage("src/images/mercedes.png"), x, y, GameConfig.ROAD_WIDTH/3, GameConfig.ROAD_HEIGHT/11, null);
+		
+	}
+	
 	
 	/**
 	 * This method print a vertical {@link Line}.
@@ -222,13 +278,34 @@ public class PaintStrategy {
 	 * 			a {@link Graphics} object.
 	 * */
 	
-	private void paintVerticalPanel(Panel verticalPanel, Graphics g) {
+	private void paintVerticalPanel(Panel verticalPanel, int axis, Graphics g) {
+		
 		Position position = verticalPanel.getPosition();
 		
 		int x = (int)position.getX();
 		int y = (int)position.getY();
+
+		Graphics2D g2D = (Graphics2D)g;
 		
-		g.drawImage(Utility.readImage("src/images/stop.png"), x, y, GameConfig.PANEL_WIDTH, GameConfig.PANEL_HEIGHT, null);
+		AffineTransform old = g2D.getTransform();
+		
+		Position centerPanel = Utility.getObjectCenter(position, GameConfig.PANEL_WIDTH, GameConfig.PANEL_HEIGHT);
+		
+		double xPanel = centerPanel.getX();
+		double yPanel = centerPanel.getY();
+		
+		if(axis == 1 ) {
+			g2D.rotate(Math.toRadians(90), xPanel, yPanel);
+			g2D.drawImage(Utility.readImage("src/images/stop.png"), x, y, GameConfig.PANEL_WIDTH, GameConfig.PANEL_HEIGHT, null);
+		}
+		
+		else if(axis == 2) {
+			g2D.rotate(Math.toRadians(270), xPanel, yPanel);
+			g2D.drawImage(Utility.readImage("src/images/stop.png"), x, y, GameConfig.PANEL_WIDTH, GameConfig.PANEL_HEIGHT, null);
+		}
+		
+		g2D.setTransform(old);
+		
 	}
 	
 	/**
@@ -240,15 +317,35 @@ public class PaintStrategy {
 	 * 			a {@link Graphics} object.
 	 * */
 	
-	private void paintHorizontalPanel(Panel horizontalPanel, Graphics g) {
+	private void paintHorizontalPanel(Panel horizontalPanel, int axis, Graphics g) {
 		Position position = horizontalPanel.getPosition();
 		
 		int x = (int)position.getX();
 		int y = (int)position.getY();
 		
-		g.drawImage(Utility.readImage("src/images/stop.png"), x, y, GameConfig.PANEL_HEIGHT, GameConfig.PANEL_WIDTH, null);
+		Graphics2D g2D = (Graphics2D)g;
+		
+		AffineTransform old = g2D.getTransform();
+		
+		Position centerPanel = Utility.getObjectCenter(position, GameConfig.PANEL_WIDTH, GameConfig.PANEL_HEIGHT);
+		
+		double xPanel = centerPanel.getX();
+		double yPanel = centerPanel.getY();
+		 
+		
+		if(axis == 1) {
+			g2D.rotate(Math.toRadians(180), xPanel, yPanel);
+			g2D.drawImage(Utility.readImage("src/images/stop.png"), x, y, GameConfig.PANEL_WIDTH, GameConfig.PANEL_HEIGHT, null);
+		}
+		
+		else if(axis == 2) {
+			g2D.rotate(Math.toRadians(0), xPanel, yPanel);
+			g2D.drawImage(Utility.readImage("src/images/stop.png"), x, y, GameConfig.PANEL_WIDTH, GameConfig.PANEL_HEIGHT, null);
+			
+		}
+		
+		g2D.setTransform(old);
 	}
-	
 	
 	/**
 	 * This method print a VR_TO_RHR {@link Turning}.
@@ -430,6 +527,11 @@ public class PaintStrategy {
 	private void paintCrossroads(Crossroads crossroads, Graphics g) {
 		Position position = crossroads.getPosition();
 		
+		ArrayList<Panel> panels = crossroads.getPanels(); 
+		
+		Panel pC1 = panels.get(0);
+		Panel pC2 = panels.get(1);
+		
 		int x = (int)position.getX();
 		int y = (int)position.getY();
 		
@@ -447,6 +549,17 @@ public class PaintStrategy {
 			else if(pedestrianCrossing.getAxis() == PedestrianCrossing.VERTICAL_AXIS){
 				paintVerticalPedesrianCrossing(pedestrianCrossing, g);
 			}
+		}
+		
+		
+		
+		if(Utility.getCrossroadsType(crossroads) == Utility.CROSSROADS_1) {
+			paintVerticalPanel(pC1, 1, g);
+			paintHorizontalPanel(pC2, 1, g);
+		}
+		else if(Utility.getCrossroadsType(crossroads) == Utility.CROSSROADS_2) {
+			paintVerticalPanel(pC1, 2, g);
+			paintHorizontalPanel(pC2, 2, g);
 		}
 
 		
@@ -507,6 +620,93 @@ public class PaintStrategy {
 			yPedestrianCrossing += GameConfig.PEDESTRIAN_CROSSING_WIDTH + GameConfig.PEDESTRIAN_CROSSING_WIDTH/4;
 		}
 		
+	}
+	
+	/**
+	 * This method print a road {@link Extension}.
+	 * 
+	 * @param extension
+	 * 					The {@link Extension}.
+	 * @param g
+	 * 			a {@link Graphics} object.
+	 * 
+	 * */
+	
+	private void paintExtension(Extension extension, Graphics g) {
+		
+		Position extensionPosition = extension.getPosition();
+		
+		
+		int x = (int)extensionPosition.getX();
+		int y = (int)extensionPosition.getY();
+		
+		g.setColor(Color.GRAY);
+		
+		g.fillRect(x, y, GameConfig.ROAD_WIDTH, GameConfig.ROAD_WIDTH);		
+		
+		int extensionAxis = extension.getAxis();
+		
+		Line line = extension.getLine();
+		
+		if(extensionAxis == Extension.HORIZONTAL_AXIS) {
+			paintExtensionHorizontalLine(line, g);
+		}
+		
+		else if(extensionAxis == Extension.VERTICAL_AXIS){
+			paintExtensionVerticalLine(line, g);
+		}
+		
+	}
+	
+	
+	/**
+	 * This method print the {@link Line} of a vertical extension.
+	 * 
+	 * @param line
+	 * 				A {@link Line}.
+	 * 
+	 * @param g
+	 * 			A {@link Graphics} object.
+	 * 
+	 * */
+	
+	private void paintExtensionVerticalLine(Line line, Graphics g) {
+
+		Position linePosition = line.getPosition();
+		
+		int x = (int)linePosition.getX();
+		int y = (int)linePosition.getY();
+		
+		Graphics2D g2D = (Graphics2D)g;
+		
+		setLineStroke(DEFAULT_DASH, g2D);
+		
+		g2D.drawLine(x, y, x, y + GameConfig.ROAD_WIDTH);
+	} 
+	
+	/**
+	 * This method print the {@link Line} of a horizontal extension.
+	 * 
+	 * @param line
+	 * 				A {@link Line}.
+	 * 
+	 * @param g
+	 * 			A {@link Graphics} object.
+	 * 
+	 * */
+	
+	private void paintExtensionHorizontalLine(Line line, Graphics g) {
+
+		Position linePosition = line.getPosition();
+		
+		int x = (int)linePosition.getX();
+		int y = (int)linePosition.getY();
+		
+		Graphics2D g2D = (Graphics2D)g;
+		
+		setLineStroke(DEFAULT_DASH, g2D);
+		
+		g2D.drawLine(x, y, x + GameConfig.ROAD_WIDTH, y);
 	}
 
 }

@@ -10,10 +10,13 @@ import data.map.Panel;
 public abstract class Intersection extends CityElement {
 	
 	private ArrayList<Panel> panels;
+	private ArrayList<PedestrianCrossing> pedestrianCrossings;
 	
 	
-	public Intersection(Position position) {
+	public Intersection(Position position, ArrayList<PedestrianCrossing> pedestrianCrossings) {
 		super(position);
+		this.pedestrianCrossings = pedestrianCrossings;
+		
 	}
 
 	
@@ -29,4 +32,11 @@ public abstract class Intersection extends CityElement {
 
 	public abstract void setLine(Line line);
 
+	public ArrayList<PedestrianCrossing> getPedestrianCrossings() {
+		return pedestrianCrossings;
+	}
+
+	public void setPedestrianCrossings(ArrayList<PedestrianCrossing> pedestrianCrossings) {
+		this.pedestrianCrossings = pedestrianCrossings;
+	}
 }

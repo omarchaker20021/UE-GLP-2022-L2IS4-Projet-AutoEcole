@@ -6,6 +6,7 @@ import config.GameConfig;
 import data.geometry.Position;
 import data.geometry.Vector;
 import data.map.City;
+import data.map.Extension;
 import data.map.Road;
 import data.map.Turning;
 import data.map.intersections.Crossroads;
@@ -27,10 +28,23 @@ public class MobileElementManager {
 		this.distance = 0;
 	}
 	
-	public void set(ArrayList<Road> roads, ArrayList<Turning> turnings, ArrayList<Crossroads> crossroadss) {
+	public void set(ArrayList<Road> roads,
+			ArrayList<Turning> turnings, 
+			ArrayList<Crossroads> crossroadss,
+			ArrayList<Extension> extensions) {
 		this.city.setRoads(roads);
 		this.city.setTurnings(turnings);
 		this.city.setCrossroadss(crossroadss);
+		this.city.setExtensions(extensions);
+	}
+	
+	public void set(ArrayList<Road> roads,
+			ArrayList<Turning> turnings, 
+			ArrayList<Crossroads> crossroadss,
+			ArrayList<Extension> extensions, 
+			Car secondaryCar) {
+		this.set(roads, turnings, crossroadss, extensions);
+		this.city.setSecondaryCar(secondaryCar);
 	}
 	
 	public void set(Car car) {
@@ -91,7 +105,11 @@ public class MobileElementManager {
 		ArrayList<Road> roads = this.city.getRoads();
 		ArrayList<Turning> turnings = this.city.getTurnings();
 		ArrayList<Crossroads> crossroadss = this.city.getCrossroadss();
+		ArrayList<Extension> extensions = this.city.getExtensions();
+		Car secondaryCar = this.city.getSecondaryCar();
 
+		
+		//Move roads
 		
 		for (Road road : roads) {
 			Position position = road.getPosition();
@@ -105,6 +123,8 @@ public class MobileElementManager {
 			road.setPosition(position);
 		}
 		
+		//Move turnings
+		
 		for (Turning turning : turnings) {
 			Position position1 = turning.getPosition();
 			
@@ -117,19 +137,45 @@ public class MobileElementManager {
 			turning.setPosition(position1);
 		}
 		
+		//Move crossroads
+		
 		for (Crossroads crossroads : crossroadss) {
 			Position position2 = crossroads.getPosition();
 			
-			double xCrossroads = position2.getX();
-			double yCrossroads = position2.getY();
+			double xCrossroads = position2.getX() + x;
+			double yCrossroads = position2.getY() + y;
 			
-			position2.setX(xCrossroads + x);
-			position2.setY(yCrossroads + y);
-			
-			crossroads.setPosition(position2);
+			crossroads.setPosition(new Position(xCrossroads, yCrossroads));
 		}
 		
-		set(roads, turnings, crossroadss);
+		//Move road extensions
+		
+		for (Extension extension : extensions) {
+			Position extensionPosition = extension.getPosition();
+			
+			double xExtension = extensionPosition.getX();
+			double yExtension = extensionPosition.getY();
+			
+			extensionPosition.setX(xExtension + x);
+			extensionPosition.setY(yExtension + y);
+			
+			extension.setPosition(extensionPosition);
+		}
+		
+		//Move secondaryCar
+		
+		Position secondaryCarPosition = secondaryCar.getPosition();
+		
+		double xSC = secondaryCarPosition.getX();
+		double ySC = secondaryCarPosition.getY();
+		
+		secondaryCarPosition.setX(xSC + x);
+		secondaryCarPosition.setY(ySC + y);
+		
+		secondaryCar.setPosition(secondaryCarPosition);
+		
+		//set the city
+		set(roads, turnings, crossroadss, extensions, secondaryCar);
 		
 	}
 	

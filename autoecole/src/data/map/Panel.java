@@ -11,8 +11,8 @@ public class Panel extends CityElement {
 	 * Cette classe est une classe de données d'un panneau de signalisation
 	 * */
 	
-	public static final int STOP_PANEL = 0;
-	public static final int SPEED_LIMIT_PANEL = 1;
+	public static final int STOP_PANEL = 5;
+	public static final int SPEED_LIMIT_PANEL = 6;
 	public static final int PANEL2 = 2;
 	
 	private int type;
@@ -25,6 +25,10 @@ public class Panel extends CityElement {
 	public Panel(int type, Position position) throws PanelNameException {
 		super(position);
 		if(type == STOP_PANEL) {
+			this.type = type;
+		}
+		
+		else if(type == SPEED_LIMIT_PANEL) {
 			this.type = type;
 		}
 		else {

@@ -11,7 +11,7 @@ import data.map.Panel;
  * @author Rayane KHAMAILY
  * */
 
-public class Roundabout extends Crossroads {
+public class Roundabout extends Intersection{
 	
 	private Line line;
 

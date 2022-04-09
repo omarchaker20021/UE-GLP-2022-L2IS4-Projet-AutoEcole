@@ -1,17 +1,19 @@
 package config;
 
+import data.map.City;
+
 public class GameConfig {
 
 	
 
-	/** Largeur de la ville **/
+	/** {@link City} width **/
 	public static final int CITY_WIDTH = 3000;
-	/** Hauteur de la ville **/
+	/** {@link City} height **/
 	public static final int CITY_HEIGHT = 3000;
 	
-	/** Largeur de l'interface **/
+	/** Window width **/
 	public static final int WINDOW_WIDTH = 900;
-	/** Hauteur de l'interface **/
+	/** Window height **/
 	public static final int WINDOW_HEIGHT = 700;
 	
 	/** Largeur de la map **/
@@ -20,9 +22,9 @@ public class GameConfig {
 	public static final int MAP_HEIGHT = 600;
 	
 	/** Largeur de la route **/
-	public static final int ROAD_WIDTH = 400;
+	public static final int ROAD_WIDTH = 40;
 	/** Hauteur de la route **/
-	public static final int ROAD_HEIGHT = 2400;
+	public static final int ROAD_HEIGHT = 240;
 
 	/** Position x de la route **/
 	public static final int VERTICAL_ROAD_POSITION_X = (MAP_WIDTH / 2) - (ROAD_WIDTH / 2);
@@ -50,9 +52,9 @@ public class GameConfig {
 	public static final int LINE_POSITION_Y = 0;
 	
 	/** Largeur du stop **/
-	public static final int PANEL_WIDTH = 50;
+	public static final int PANEL_WIDTH = ROAD_WIDTH/4;
 	/** Hauteur du stop **/
-	public static final int PANEL_HEIGHT = 100;
+	public static final int PANEL_HEIGHT = ROAD_HEIGHT/16;
 	
 	/** Position x du stop **/
 	public static final int STOP_POSITION_X = VERTICAL_ROAD_POSITION_X + ROAD_WIDTH + (VERTICAL_ROAD_POSITION_X/2) - (PANEL_WIDTH/2); 
@@ -65,7 +67,7 @@ public class GameConfig {
 	public static final int PEDESTRIAN_CROSSING_HEIGHT = (ROAD_WIDTH/10)*3;
 	
 	/** Rapidité du jeu **/
-	public static final int GAME_SPEED = 50;
+	public static final int GAME_SPEED = 30;
 	
 	/** Differentiel du mouvement en avant **/
 	public static final int MOVE_INTERVAL = 1;
