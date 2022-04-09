@@ -19,6 +19,8 @@ public class MobileElementManager {
 	private Vector rotationVector = new Vector();
 	
 	private double distance;
+	
+	private Position movePosition;
 		
 	private City city;
 
@@ -73,7 +75,7 @@ public class MobileElementManager {
 	public void turnLeft() {
 		
 		double carPace = car.getPace();
-		if(carPace < 1) {
+		if(carPace > 0 && carPace < 1) {
 			moveCity(GameConfig.MOVE_INTERVAL, 0);
 		}
 	}
@@ -81,7 +83,7 @@ public class MobileElementManager {
 	public void turnRight() {
 		
 		double carPace = car.getPace();
-		if(carPace < 1) {
+		if(carPace > 0 && carPace < 1) {
 			moveCity(GameConfig.MOVE_INTERVAL ,0);
 		}
 	}
@@ -208,6 +210,14 @@ public class MobileElementManager {
 
 	public void setDistance(int distance) {
 		this.distance = distance;
+	}
+
+	public Position getMovePosition() {
+		return movePosition;
+	}
+
+	public void setMovePosition(Position movePosition) {
+		this.movePosition = movePosition;
 	}
 
 }

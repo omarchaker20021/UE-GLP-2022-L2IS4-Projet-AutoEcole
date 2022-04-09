@@ -21,11 +21,20 @@ public class GameConfig {
 	/** Hauteur de la map **/
 	public static final int MAP_HEIGHT = 600;
 	
+	
 	/** Largeur de la route **/
 	public static final int ROAD_WIDTH = 40;
+	
+	// Simulation normale : 300
+	// Debug : 40
+	
 	/** Hauteur de la route **/
 	public static final int ROAD_HEIGHT = 240;
 
+	// Simulation normale : 1800
+	// Debug : 240
+		
+	
 	/** Position x de la route **/
 	public static final int VERTICAL_ROAD_POSITION_X = (MAP_WIDTH / 2) - (ROAD_WIDTH / 2);
 	/** Position y de la route **/
